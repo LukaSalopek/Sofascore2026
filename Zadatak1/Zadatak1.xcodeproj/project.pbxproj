@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D2384ADE2F5C770500F4D50F /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D2384ADD2F5C770500F4D50F /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D22CCEA62F59C0DC002E9851 /* Zadatak1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zadatak1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2384ADE2F5C770500F4D50F /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = Zadatak1;
 			packageProductDependencies = (
+				D2384ADD2F5C770500F4D50F /* SnapKit */,
 			);
 			productName = Zadatak1;
 			productReference = D22CCEA62F59C0DC002E9851 /* Zadatak1.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = D22CCE9D2F59C0DC002E9851;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D2384ADC2F5C770500F4D50F /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D22CCEA72F59C0DC002E9851 /* Products */;
 			projectDirPath = "";
@@ -343,6 +352,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D2384ADC2F5C770500F4D50F /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D2384ADD2F5C770500F4D50F /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D2384ADC2F5C770500F4D50F /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D22CCE9E2F59C0DC002E9851 /* Project object */;
 }
