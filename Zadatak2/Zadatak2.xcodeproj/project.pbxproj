@@ -15,9 +15,22 @@
 		D2997B022F60597D00C890D9 /* Zadatak2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zadatak2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D2997B142F60597E00C890D9 /* Exceptions for "Zadatak2" folder in "Zadatak2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D2997B012F60597D00C890D9 /* Zadatak2 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D2997B042F60597D00C890D9 /* Zadatak2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D2997B142F60597E00C890D9 /* Exceptions for "Zadatak2" folder in "Zadatak2" target */,
+			);
 			path = Zadatak2;
 			sourceTree = "<group>";
 		};
