@@ -16,7 +16,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D2997B142F60597E00C890D9 /* Exceptions for "Zadatak2" folder in "Zadatak2" target */ = {
+		D279BB812F67477300D698EE /* Exceptions for "Zadatak2" folder in "Zadatak2" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -29,7 +29,7 @@
 		D2997B042F60597D00C890D9 /* Zadatak2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				D2997B142F60597E00C890D9 /* Exceptions for "Zadatak2" folder in "Zadatak2" target */,
+				D279BB812F67477300D698EE /* Exceptions for "Zadatak2" folder in "Zadatak2" target */,
 			);
 			path = Zadatak2;
 			sourceTree = "<group>";
