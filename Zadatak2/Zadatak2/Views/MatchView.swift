@@ -9,22 +9,23 @@ import SofaAcademic
 import UIKit
 import SnapKit
 
+
 class MatchView: BaseView {
     
     private var matchTime = UILabel()
     private var matchMinute = UILabel()
-
     private var homeTeamName = UILabel()
     private var awayTeamName = UILabel()
-    
     private var homeTeamScore = UILabel()
     private var awayTeamScore = UILabel()
-    
     private var homeTeamLogo = UIImageView()
     private var awayTeamLogo = UIImageView()
+    private var linija = UIView()
     
     override func addViews() {
         addSubview(matchTime)
+        addSubview(matchMinute)
+        addSubview(linija)
         addSubview(homeTeamName)
         addSubview(awayTeamName)
         addSubview(homeTeamScore)
@@ -34,93 +35,116 @@ class MatchView: BaseView {
     }
 
     override func styleViews() {
-        matchTime.font = .systemFont(ofSize: 12)
-        matchTime.textColor = .gray
+        matchTime.font = .sofaTime
+        matchTime.textColor = .sofaGray
         
-        homeTeamName.font = .systemFont(ofSize: 14, weight: .regular)
-        awayTeamName.font = .systemFont(ofSize: 14, weight: .regular)
+        matchMinute.font = .sofaTime
+        matchMinute.textColor = .sofaGray
         
-        homeTeamScore.font = .systemFont(ofSize: 14, weight: .regular)
-        awayTeamScore.font = .systemFont(ofSize: 14, weight: .regular)
+        homeTeamName.font = .sofaTeamName
+        awayTeamName.font = .sofaTeamName
+        homeTeamName.numberOfLines = 2
+        awayTeamName.numberOfLines = 2
         
-        //test
+        homeTeamScore.font = .sofaScore
+        awayTeamScore.font = .sofaScore
         
-        matchTime.text="12"
-        homeTeamName.text="Real Madrid"
-        homeTeamScore.text="1"
-        
-        awayTeamName.text="Barcelona"
-        awayTeamScore.text="0"
-        
-    
-        
+        linija.backgroundColor = .sofaSeparator
     }
 
     override func setupConstraints() {
         matchTime.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-            $0.top.equalToSuperview()
-            $0.width.equalTo(64)
+            $0.leading.top.equalToSuperview()
+            $0.width.equalTo(45)
         }
         
-        homeTeamLogo.snp.makeConstraints{
+        matchMinute.snp.makeConstraints {
+            $0.top.equalTo(matchTime.snp.bottom).offset(5)
+            $0.centerX.equalTo(matchTime.snp.centerX).offset(-7)
+        }
+        
+        linija.snp.makeConstraints {
+            $0.leading.equalTo(matchTime.snp.trailing)
+            $0.height.equalToSuperview()
+            $0.width.equalTo(0.5)
+        }
+        
+        homeTeamLogo.snp.makeConstraints {
             $0.size.equalTo(16)
-            $0.leading.equalTo(matchTime.snp.trailing).offset(8)
-            $0.centerY.equalToSuperview().offset(8)
-        }
-        
-        homeTeamName.snp.makeConstraints{
-            $0.leading.equalTo(homeTeamLogo).offset(8)
+            $0.leading.equalTo(matchTime.snp.trailing).offset(12)
             $0.top.equalToSuperview()
         }
-        
-        awayTeamLogo.snp.makeConstraints{
-            $0.leading.equalTo(matchTime.snp.trailing).offset(8)
-            $0.bottom.equalToSuperview().offset(8)
+
+        homeTeamName.snp.makeConstraints {
+            $0.leading.equalTo(homeTeamLogo.snp.trailing).offset(8)
+            $0.centerY.equalTo(homeTeamLogo)
+            $0.trailing.lessThanOrEqualTo(homeTeamScore.snp.leading).offset(-8)
         }
-        
-        awayTeamName.snp.makeConstraints{
-            $0.leading.equalTo(awayTeamLogo).offset(8)
+
+        awayTeamLogo.snp.makeConstraints {
+            $0.size.equalTo(16)
+            $0.leading.equalTo(homeTeamLogo)
             $0.bottom.equalToSuperview()
         }
-        
-        
-        homeTeamScore.snp.makeConstraints{
+
+        awayTeamName.snp.makeConstraints {
+            $0.leading.equalTo(awayTeamLogo.snp.trailing).offset(8)
+            $0.centerY.equalTo(awayTeamLogo)
+            $0.trailing.lessThanOrEqualTo(awayTeamScore.snp.leading).offset(-8)
+        }
+
+        homeTeamScore.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.top.equalToSuperview()
         }
-        
-        awayTeamScore.snp.makeConstraints{
+
+        awayTeamScore.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
-    }
-
-    override func setupGestureRecognizers() {
-        // Configure gesture recognizers
-    }
-
-    override func setupBinding() {
-        // Set up bindings
     }
     
-    func configure(
-        matchTime : String,
-        matchMinute : String,
-        matchStatus : UIColor,
-        homeTeamName : String,
-        awayTeamName : String,
-        homeTeamLogo : String,
-        awayTeamLogo : String,
-        homeTeamScore : String,
-        awayTeamScore : String,
-        homeTeamColor : UIColor,
-        awayTeamColor : UIColor
-    ){
-        
+    func setMatch(firstName: String, secondName: String, matchTime: String) {
+        self.homeTeamName.text = firstName
+        self.awayTeamName.text = secondName
+        self.matchTime.text = matchTime
     }
-}
-
-#Preview {
-    LeagueView()
+    
+    func updateHomeLogo(firstLogo: String) {
+        self.homeTeamLogo.image = UIImage(named: firstLogo)
+    }
+    
+    func updateAwayLogo(secondLogo: String) {
+        self.awayTeamLogo.image = UIImage(named: secondLogo)
+    }
+    
+    func updateTime(time: String) {
+        self.matchMinute.text = time
+    }
+    
+    func updateScore(firstScore: Int, secondScore: Int) {
+        self.homeTeamScore.text = String(firstScore)
+        self.awayTeamScore.text = String(secondScore)
+    }
+    
+    func isLive() {
+        self.matchMinute.textColor = .sofaLiveRed
+        self.homeTeamScore.textColor = .sofaLiveRed
+        self.awayTeamScore.textColor = .sofaLiveRed
+    }
+    
+    func firstWinner() {
+        self.awayTeamName.textColor = .sofaGray
+        self.awayTeamScore.textColor = .sofaGray
+    }
+    
+    func secondWinner() {
+        self.homeTeamName.textColor = .sofaGray
+        self.homeTeamScore.textColor = .sofaGray
+    }
+    
+    func draw() {
+        firstWinner()
+        secondWinner()
+    }
 }
