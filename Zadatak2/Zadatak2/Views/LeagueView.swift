@@ -1,5 +1,5 @@
 //
-//  MatchView.swift
+//  LeagueView.swift
 //  Zadatak2
 //
 //  Created by akademija on 10.03.2026..
@@ -26,37 +26,41 @@ class LeagueView: BaseView {
     override func styleViews() {
         countryName.font = .sofaLeagueCountry
         countryName.textColor = .sofaTextBlack
-        
-        leagueName.font = .sofaLeagueName
-        leagueName.textColor = .sofaGray
+        countryName.numberOfLines = 1
+        countryName.lineBreakMode = .byTruncatingTail
         
         littleIcon.image = UIImage(systemName: AppStrings.iconPlay)
         littleIcon.tintColor = .sofaGray
+        
+        leagueName.font = .sofaLeagueName
+        leagueName.textColor = .sofaGray
+        leagueName.numberOfLines = 1
+        leagueName.lineBreakMode = .byTruncatingTail
     }
 
     override func setupConstraints() {
         leagueLogo.snp.makeConstraints {
             $0.size.equalTo(32)
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.equalToSuperview().offset(12)
-            $0.bottom.equalToSuperview().offset(-12)
+            $0.leading.equalToSuperview().inset(16)
+            $0.top.bottom.equalToSuperview().inset(12)
         }
         
         countryName.snp.makeConstraints {
-            $0.leading.equalTo(leagueLogo.snp.trailing).offset(12)
-            $0.centerY.equalTo(leagueLogo)
+            $0.leading.equalTo(leagueLogo.snp.trailing).offset(32)
+            $0.top.bottom.equalToSuperview().inset(20)
         }
         
         littleIcon.snp.makeConstraints {
-            $0.leading.equalTo(countryName.snp.trailing).offset(4)
-            $0.centerY.equalTo(countryName)
-            $0.height.equalTo(14)
+            $0.leading.equalTo(countryName.snp.trailing).offset(10)
+            $0.height.equalTo(10)
             $0.width.equalTo(5)
+            $0.top.bottom.equalToSuperview().inset(23)
         }
         
         leagueName.snp.makeConstraints {
-            $0.leading.equalTo(littleIcon.snp.trailing).offset(4)
-            $0.centerY.equalTo(countryName)
+            $0.leading.equalTo(littleIcon.snp.trailing).offset(9)
+            $0.top.bottom.equalToSuperview().inset(20)
+            $0.trailing.lessThanOrEqualToSuperview().inset(129)
         }
     }
     

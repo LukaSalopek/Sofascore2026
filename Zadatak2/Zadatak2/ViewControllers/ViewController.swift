@@ -6,84 +6,92 @@ class ViewController: UIViewController {
     
     private var leagueView = LeagueView()
     private let data = Homework2DataSource()
-    lazy var matches = data.laLigaEvents()
-    lazy var league = data.laLigaLeague()
+    private lazy var matches = data.laLigaEvents()
+    private lazy var league = data.laLigaLeague()
+    
+    private let contentStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        return stack
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        setupLeague()
+        setupLayout()
         configureLeague()
         setupMatchViews()
     }
     
-    func setupLeague() {
+    private func setupLayout() {
         view.addSubview(leagueView)
+        view.addSubview(contentStackView)
+        
         leagueView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             $0.left.right.equalToSuperview()
-            $0.height.equalTo(56)
+        }
+        
+        contentStackView.snp.makeConstraints {
+            $0.top.equalTo(leagueView.snp.bottom)
+            $0.left.right.equalToSuperview()
         }
     }
     
-    func configureLeague() {
+    private func configureLeague() {
         leagueView.configure(
             leagueLogo: league.name,
             countryName: league.country?.name ?? "",
             leagueName: league.name
         )
     }
-    
-    func setupMatchViews() {
-        var previousView: UIView = leagueView
-        matches.sort{ $0.startTimestamp < $1.startTimestamp}
+
+    private func setupMatchViews() {
+        matches.sort { $0.startTimestamp < $1.startTimestamp }
+        
         matches.forEach { match in
             let matchView = MatchView()
-            view.addSubview(matchView)
             
-            matchView.updateHomeLogo(firstLogo: match.homeTeam.name)
-            matchView.updateAwayLogo(secondLogo: match.awayTeam.name)
+            matchView.updateHomeLogo(homeTeam: match.homeTeamLogo)
+            matchView.updateAwayLogo(awayTeam: match.awayTeamLogo)
+            matchView.setMatch(homeTeamName: match.homeTeam.name,
+                               awayTeamName: match.awayTeam.name,
+                               matchTime: match.dataFormat)
             
-            let date = Date(timeIntervalSince1970: TimeInterval(match.startTimestamp))
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
-            let time = formatter.string(from: date)
-            matchView.setMatch(firstName: match.homeTeam.name, secondName: match.awayTeam.name, matchTime: time)
+            configureMatchStatus(matchView, match: match)
             
-            switch match.status {
-            case .notStarted:
-                matchView.updateTime(time: AppStrings.notStarted)
-            case .inProgress:
-                matchView.updateScore(firstScore: match.homeScore!, secondScore: match.awayScore!)
-                matchView.isLive()
-                let diff = Int(Date().timeIntervalSince(date) / 60)
-                matchView.updateTime(time: "\(diff)'")
-            case .halftime:
-                matchView.updateScore(firstScore: match.homeScore!, secondScore: match.awayScore!)
-                matchView.isLive()
-                matchView.updateTime(time: AppStrings.halftime)
-            case .finished:
-                matchView.updateScore(firstScore: match.homeScore!, secondScore: match.awayScore!)
-                if match.homeScore! > match.awayScore! {
-                    matchView.firstWinner()
-                } else if match.homeScore! < match.awayScore! {
-                    matchView.secondWinner()
-                } else {
-                    matchView.draw()
-                }
-                matchView.updateTime(time: AppStrings.finished)
+            contentStackView.addArrangedSubview(matchView)
+            
+            
+        }
+    }
+    
+    private func configureMatchStatus(_ matchView: MatchView, match: Event) {
+        switch match.status {
+        case .notStarted:
+            matchView.updateTime(time: AppStrings.notStarted)
+        case .inProgress:
+            matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore)
+            matchView.isLive()
+            matchView.updateTime(time: "\(match.timeDifference)'")
+        case .halftime:
+            matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore)
+            matchView.isLive()
+            matchView.updateTime(time: AppStrings.halftime)
+        case .finished:
+            matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore )
+            if match.getHomeTeamScore > match.getAwayTeamScore {
+                matchView.firstWinner()
+            } else if match.getHomeTeamScore < match.getAwayTeamScore {
+                matchView.secondWinner()
+            } else {
+                matchView.draw()
             }
-            
-            matchView.snp.makeConstraints {
-                $0.leading.equalToSuperview()
-                $0.left.right.equalToSuperview().inset(10)
-                $0.top.equalTo(previousView.snp.bottom).offset(10)
-                $0.height.equalTo(35)
-            }
-            previousView = matchView
+            matchView.updateTime(time: AppStrings.finished)
         }
     }
 }
+
 
 #Preview {
     ViewController()
