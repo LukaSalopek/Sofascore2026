@@ -29,12 +29,12 @@ class ViewController: UIViewController {
         
         leagueView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
         }
         
         contentStackView.snp.makeConstraints {
             $0.top.equalTo(leagueView.snp.bottom)
-            $0.left.right.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
         }
     }
     
