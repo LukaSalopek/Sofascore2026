@@ -26,11 +26,11 @@ extension Event {
     }
     
     var dataFormat: String {
-        return DataFormatter.shared.formatter(interval: TimeInterval(self.startTimestamp))
+        return SofaDateFormatter.shared.formatter(interval: TimeInterval(self.startTimestamp))
     }
     
     var timeDifference: Int {
-        let date = DataFormatter.shared.dateFormat(interval: TimeInterval(self.startTimestamp))
+        let date = SofaDateFormatter.shared.dateFormat(interval: TimeInterval(self.startTimestamp))
         let diff = Int(Date().timeIntervalSince(date) / 60)
         return diff
     }

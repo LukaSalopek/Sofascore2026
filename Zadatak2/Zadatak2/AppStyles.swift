@@ -23,9 +23,10 @@ extension UIFont {
     static let sofaLeagueName = UIFont.systemFont(ofSize: 14)
 }
 
+
+
 enum AppStrings {
     static let finished = "FT"
     static let halftime = "HT"
     static let notStarted = "-"
-    static let iconPlay = "play.fill"
 }

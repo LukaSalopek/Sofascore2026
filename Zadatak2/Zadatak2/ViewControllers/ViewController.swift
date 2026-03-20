@@ -8,6 +8,7 @@ class ViewController: UIViewController {
     private let data = Homework2DataSource()
     private lazy var matches = data.laLigaEvents()
     private lazy var league = data.laLigaLeague()
+    private var helper = ViewControllerHelper()
     
     private let contentStackView: UIStackView = {
         let stack = UIStackView()
@@ -71,24 +72,34 @@ class ViewController: UIViewController {
         case .notStarted:
             matchView.updateTime(time: AppStrings.notStarted)
         case .inProgress:
-            matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore)
-            matchView.isLive()
-            matchView.updateTime(time: "\(match.timeDifference)'")
+            matchInProgress(matchView, match: match)
         case .halftime:
-            matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore)
-            matchView.isLive()
-            matchView.updateTime(time: AppStrings.halftime)
+            matchHalfTime(matchView, match: match)
         case .finished:
-            matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore )
-            if match.getHomeTeamScore > match.getAwayTeamScore {
-                matchView.firstWinner()
-            } else if match.getHomeTeamScore < match.getAwayTeamScore {
-                matchView.secondWinner()
-            } else {
-                matchView.draw()
-            }
-            matchView.updateTime(time: AppStrings.finished)
+            matchFinished(matchView, match: match)
         }
+    }
+    
+    
+    private func matchInProgress(_ matchView: MatchView, match: Event){
+        matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore)
+        matchView.isLive()
+        matchView.updateTime(time: "\(match.timeDifference)'")
+    }
+    
+    
+    private func matchHalfTime(_ matchView: MatchView, match: Event){
+        matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore)
+        matchView.isLive()
+        matchView.updateTime(time: AppStrings.halftime)
+    }
+    
+    
+    private func matchFinished(_ matchView: MatchView, match: Event){
+        matchView.updateScore(homeScore: match.getHomeTeamScore, awayScore: match.getAwayTeamScore )
+        let teamColors = helper.setTeamColors(homeTeamScore: match.getHomeTeamScore, awayTeamScore: match.getAwayTeamScore)
+        matchView.setTeamColors(homeTeamColor: teamColors[0], awayTeamColor: teamColors[1])
+        matchView.updateTime(time: AppStrings.finished)
     }
 }
 

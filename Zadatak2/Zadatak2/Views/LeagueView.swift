@@ -29,7 +29,7 @@ class LeagueView: BaseView {
         countryName.numberOfLines = 1
         countryName.lineBreakMode = .byTruncatingTail
         
-        littleIcon.image = UIImage(systemName: AppStrings.iconPlay)
+        littleIcon.image = UIImage(named: "Vector")
         littleIcon.tintColor = .sofaGray
         
         leagueName.font = .sofaLeagueName
@@ -47,20 +47,22 @@ class LeagueView: BaseView {
         
         countryName.snp.makeConstraints {
             $0.leading.equalTo(leagueLogo.snp.trailing).offset(32)
-            $0.top.bottom.equalToSuperview().inset(20)
+            $0.centerY.equalTo(leagueLogo.snp.centerY)
+            $0.height.equalTo(16)
         }
         
         littleIcon.snp.makeConstraints {
             $0.leading.equalTo(countryName.snp.trailing).offset(10)
             $0.height.equalTo(10)
             $0.width.equalTo(5)
-            $0.top.bottom.equalToSuperview().inset(23)
+            $0.centerY.equalTo(leagueLogo.snp.centerY)
         }
         
         leagueName.snp.makeConstraints {
             $0.leading.equalTo(littleIcon.snp.trailing).offset(9)
-            $0.top.bottom.equalToSuperview().inset(20)
-            $0.trailing.lessThanOrEqualToSuperview().inset(129)
+            $0.centerY.equalTo(leagueLogo.snp.centerY)
+            $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.height.equalTo(16)
         }
     }
     

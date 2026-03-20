@@ -72,6 +72,7 @@ class MatchView: BaseView {
             $0.top.equalToSuperview().inset(10)
             $0.leading.equalToSuperview().inset(4)
             $0.width.equalTo(56)
+            $0.height.equalTo(16)
             
         }
             
@@ -79,6 +80,7 @@ class MatchView: BaseView {
             $0.top.equalTo(matchTime.snp.bottom).offset(4)
             $0.leading.equalToSuperview().inset(4)
             $0.width.equalTo(56)
+            $0.height.equalTo(16)
         }
         
         line.snp.makeConstraints {
@@ -86,6 +88,7 @@ class MatchView: BaseView {
             $0.leading.equalTo(matchTime.snp.trailing).offset(3)
             $0.height.equalTo(40)
             $0.width.equalTo(1)
+            
             
         }
         
@@ -103,26 +106,28 @@ class MatchView: BaseView {
 
         homeTeamName.snp.makeConstraints {
             $0.leading.equalTo(homeTeamLogo.snp.trailing).offset(8)
-            $0.top.equalToSuperview().inset(10)
-            $0.trailing.lessThanOrEqualToSuperview().inset(64)
+            $0.centerY.equalTo(homeTeamLogo.snp.centerY)
+            $0.trailing.lessThanOrEqualTo(homeTeamScore.snp.leading).inset(16)
+            $0.height.equalTo(16)
         }
 
         awayTeamName.snp.makeConstraints {
             $0.leading.equalTo(awayTeamLogo.snp.trailing).offset(8)
-            $0.top.equalTo(homeTeamName.snp.bottom).offset(4)
-            $0.trailing.lessThanOrEqualToSuperview().inset(64)
+            $0.centerY.equalTo(awayTeamLogo.snp.centerY)
+            $0.trailing.lessThanOrEqualTo(awayTeamScore.snp.leading).inset(16)
+            $0.height.equalTo(16)
         }
 
         homeTeamScore.snp.makeConstraints {
-            $0.leading.lessThanOrEqualToSuperview().inset(312)
             $0.trailing.equalToSuperview().inset(16)
-            $0.top.equalToSuperview().inset(10)
+            $0.centerY.equalTo(homeTeamLogo.snp.centerY)
+            $0.height.equalTo(16)
         }
 
         awayTeamScore.snp.makeConstraints {
-            $0.leading.lessThanOrEqualToSuperview().inset(312)
             $0.trailing.equalToSuperview().inset(16)
-            $0.top.equalTo(homeTeamLogo.snp.bottom).offset(4)
+            $0.centerY.equalTo(awayTeamLogo.snp.centerY)
+            $0.height.equalTo(16)
         }
     }
     
@@ -155,18 +160,10 @@ class MatchView: BaseView {
         self.awayTeamScore.textColor = .sofaLiveRed
     }
     
-    func firstWinner() {
-        self.awayTeamName.textColor = .sofaGray
-        self.awayTeamScore.textColor = .sofaGray
-    }
-    
-    func secondWinner() {
-        self.homeTeamName.textColor = .sofaGray
-        self.homeTeamScore.textColor = .sofaGray
-    }
-    
-    func draw() {
-        firstWinner()
-        secondWinner()
+    func setTeamColors(homeTeamColor : UIColor, awayTeamColor : UIColor) {
+        self.homeTeamName.textColor = homeTeamColor
+        self.awayTeamName.textColor = awayTeamColor
+        self.homeTeamScore.textColor = homeTeamColor
+        self.awayTeamScore.textColor = awayTeamColor
     }
 }
