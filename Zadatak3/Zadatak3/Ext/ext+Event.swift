@@ -18,19 +18,19 @@ extension Event {
     }
     
     var homeTeamLogo: UIImage {
-        return UIImage(named: self.homeTeam.name) ?? UIImage()
+        return UIImage(named: self.homeTeam.name.toCamelCase()) ?? UIImage()
     }
     
     var awayTeamLogo: UIImage {
-        return UIImage(named: self.awayTeam.name) ?? UIImage()
+        return UIImage(named: self.awayTeam.name.toCamelCase()) ?? UIImage()
     }
     
     var dataFormat: String {
-        return DataFormatter.shared.formatter(interval: TimeInterval(self.startTimestamp))
+        return SofaDateFormatter.shared.formatter(interval: TimeInterval(self.startTimestamp))
     }
     
     var timeDifference: Int {
-        let date = DataFormatter.shared.dateFormat(interval: TimeInterval(self.startTimestamp))
+        let date = SofaDateFormatter.shared.dateFormat(interval: TimeInterval(self.startTimestamp))
         let diff = Int(Date().timeIntervalSince(date) / 60)
         return diff
     }

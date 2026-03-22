@@ -1,5 +1,5 @@
 //
-//  DataFormatter.swift
+//  SofaDateFormatter.swift
 //  Zadatak3
 //
 //  Created by akademija on 18.03.2026..
@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class DataFormatter {
+final class SofaDateFormatter {
 
-    static let shared = DataFormatter()
+    static let shared = SofaDateFormatter()
     
     private let formatter: DateFormatter = {
         let df = DateFormatter()

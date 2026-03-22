@@ -13,6 +13,7 @@ class SportSelectorMenuCell : BaseView {
     
     private var sportIcon = UIImageView()
     private var sportName = UILabel()
+    var onSelected: (() -> Void)?
     
     
     override func addViews() {
@@ -46,6 +47,16 @@ class SportSelectorMenuCell : BaseView {
             $0.centerX.equalToSuperview()
         }
         
+    }
+    
+    override func setupGestureRecognizers(){
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        self.addGestureRecognizer(tap)
+        self.isUserInteractionEnabled = true
+    }
+    
+    @objc private func handleTap(){
+        onSelected?()
     }
     
     func setSports(sportName : String, sportImage : UIImage) {
