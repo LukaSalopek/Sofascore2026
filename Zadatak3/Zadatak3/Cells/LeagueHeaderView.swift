@@ -7,9 +7,11 @@
 
 import UIKit
 import SnapKit
+import SofaAcademic
 
 class LeagueHeaderView: UITableViewHeaderFooterView {
-    let leagueView = LeagueView()
+    private let leagueView = LeagueView()
+    static let reuseIdentifier = "LeagueHeader"
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -18,4 +20,12 @@ class LeagueHeaderView: UITableViewHeaderFooterView {
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    func configure(with league: League) {
+            leagueView.configure(
+                leagueLogo: league.name,
+                countryName: league.country?.name ?? "",
+                leagueName: league.name
+            )
+        }
 }

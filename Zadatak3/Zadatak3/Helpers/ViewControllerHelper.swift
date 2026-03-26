@@ -7,17 +7,20 @@
 
 import UIKit
 
-struct ViewControllerHelper {
-        
-    func setTeamColors(homeTeamScore : Int, awayTeamScore : Int) -> [UIColor]{
-        if homeTeamScore>awayTeamScore {
-            return [.black, .sofaGray]
-        } else if awayTeamScore > homeTeamScore {
-            return [.sofaGray, .black]
+struct TeamColors {
+    let home: UIColor
+    let away: UIColor
+}
+
+enum ViewControllerHelper {
+    
+    static func getTeamColors(homeScore: Int, awayScore: Int) -> TeamColors {
+        if homeScore > awayScore {
+            return TeamColors(home: .sofaTextBlack, away: .sofaGray)
+        } else if awayScore > homeScore {
+            return TeamColors(home: .sofaGray, away: .sofaTextBlack)
         } else {
-            return [.sofaGray, .sofaGray]
+            return TeamColors(home: .sofaGray, away: .sofaGray)
         }
     }
-    
-    
 }

@@ -151,6 +151,11 @@ class MatchView: BaseView {
         self.matchMinute.text = time
     }
     
+    func updateTimeColor(color : UIColor) {
+        self.matchTime.textColor = color
+        self.matchMinute.textColor = color
+    }
+    
     func updateScore(homeScore: String, awayScore: String) {
         self.homeTeamScore.text = homeScore
         self.awayTeamScore.text = awayScore

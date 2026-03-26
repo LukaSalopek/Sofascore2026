@@ -11,7 +11,8 @@ import SofaAcademic
 
 class MatchTableViewCell: UITableViewCell {
     private let matchView = MatchView()
-    private var helper = ViewControllerHelper()
+    static let reuseIdentifier = "MatchCell"
+    
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -30,8 +31,10 @@ class MatchTableViewCell: UITableViewCell {
         }
 
     private func resetMatchViewStyles() {
-        matchView.setTeamColors(homeTeamColor: .black, awayTeamColor: .black)
+        
+        matchView.setTeamColors(homeTeamColor: .sofaTextBlack, awayTeamColor: .sofaTextBlack)
         matchView.updateTime(time: "")
+        matchView.updateTimeColor(color: .sofaGray)
     }
 
     func configure(with match: Event) {
@@ -41,7 +44,7 @@ class MatchTableViewCell: UITableViewCell {
         matchView.updateAwayLogo(awayTeam: match.awayTeamLogo)
         matchView.setMatch(homeTeamName: match.homeTeam.name,
                            awayTeamName: match.awayTeam.name,
-                           matchTime: match.dataFormat)
+                           matchTime: match.formattedStartTime)
         
         configureMatchStatus(match)
     }
@@ -76,18 +79,18 @@ class MatchTableViewCell: UITableViewCell {
     }
 
     private func matchFinished(_ match: Event) {
-        matchView.updateScore(homeScore: String(match.getHomeTeamScore),
-                              awayScore: String(match.getAwayTeamScore))
+        matchView.updateScore(homeScore: String(match.homeTeamScore),
+                              awayScore: String(match.awayTeamScore))
         matchView.updateTime(time: AppStrings.finished)
         
-        let colors = helper.setTeamColors(homeTeamScore: match.getHomeTeamScore,
-                                          awayTeamScore: match.getAwayTeamScore)
-        matchView.setTeamColors(homeTeamColor: colors[0], awayTeamColor: colors[1])
+        let colors = ViewControllerHelper.getTeamColors(homeScore: match.homeTeamScore,
+                                                        awayScore: match.awayTeamScore)
+        matchView.setTeamColors(homeTeamColor: colors.home, awayTeamColor: colors.away)
     }
 
     private func updateLiveStatus(match: Event) {
-        matchView.updateScore(homeScore: String(match.getHomeTeamScore),
-                              awayScore: String(match.getAwayTeamScore))
+        matchView.updateScore(homeScore: String(match.homeTeamScore),
+                              awayScore: String(match.awayTeamScore))
         matchView.isLive()
     }
     

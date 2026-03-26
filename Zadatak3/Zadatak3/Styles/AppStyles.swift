@@ -13,6 +13,7 @@ extension UIColor {
     static let sofaSeparator = UIColor.lightGray
     static let sofaLiveRed = UIColor.red
     static let sofaTextBlack = UIColor.black
+    static let sofaBlue = UIColor(red: 55/255, green: 77/255, blue: 245/255, alpha: 1.0)
 }
 
 extension UIFont {

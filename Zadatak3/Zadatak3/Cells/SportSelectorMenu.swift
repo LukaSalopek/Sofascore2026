@@ -1,5 +1,5 @@
 //
-//  SportSelectorMenuCell.swift
+//  SportSelectorMenu.swift
 //  Zadatak3
 //
 //  Created by akademija on 18.03.2026..
@@ -9,11 +9,11 @@ import SnapKit
 import UIKit
 import SofaAcademic
 
-class SportSelectorMenuCell : BaseView {
+class SportSelectorMenu : BaseView {
     
     private var sportIcon = UIImageView()
     private var sportName = UILabel()
-    var onSelected: (() -> Void)?
+    var onTap: (() -> Void)?
     
     
     override func addViews() {
@@ -45,6 +45,7 @@ class SportSelectorMenuCell : BaseView {
             $0.top.equalTo(sportIcon.snp.bottom).offset(4)
             $0.bottom.equalToSuperview().inset(8)
             $0.centerX.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(8)
         }
         
     }
@@ -56,7 +57,7 @@ class SportSelectorMenuCell : BaseView {
     }
     
     @objc private func handleTap(){
-        onSelected?()
+        onTap?()
     }
     
     func setSports(sportName : String, sportImage : UIImage) {

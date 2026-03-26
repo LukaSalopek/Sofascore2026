@@ -10,10 +10,10 @@ import UIKit
 
 extension Event {
     
-    var getHomeTeamScore : Int {
+    var homeTeamScore : Int {
         return self.homeScore ?? 0
     }
-    var getAwayTeamScore : Int {
+    var awayTeamScore : Int {
         return self.awayScore ?? 0
     }
     
@@ -25,7 +25,7 @@ extension Event {
         return UIImage(named: self.awayTeam.name.toCamelCase()) ?? UIImage()
     }
     
-    var dataFormat: String {
+    var formattedStartTime: String {
         return SofaDateFormatter.shared.formatter(interval: TimeInterval(self.startTimestamp))
     }
     

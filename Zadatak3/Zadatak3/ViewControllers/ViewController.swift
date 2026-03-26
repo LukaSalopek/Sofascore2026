@@ -8,27 +8,25 @@ class ViewController: UIViewController {
     private let selectionIndicator = UIView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     
-    
-    private var sports = SportSelectorMenuData
+    private var sports = SportSelectorMenuModel.sportSelectorMenuData
     private var sections: [Section] = []
     private let eventService = EventService()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 55/255, green: 77/255, blue: 245/255, alpha: 1.0)
+        view.backgroundColor = .sofaBlue
         
         setupSportSelector()
         setupIndicator()
         setupTableView()
-        loadData()
+        loadData(shouldShowData: true)
     }
-    
     
     private func setupSportSelector() {
         view.addSubview(sportSelectorMenuStack)
         sportSelectorMenuStack.axis = .horizontal
         sportSelectorMenuStack.distribution = .fillEqually
-        sportSelectorMenuStack.backgroundColor = UIColor(red: 55/255, green: 77/255, blue: 245/255, alpha: 1.0)
+        sportSelectorMenuStack.backgroundColor = .sofaBlue
         
         sportSelectorMenuStack.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -36,9 +34,9 @@ class ViewController: UIViewController {
         }
         
         sports.enumerated().forEach { index, sport in
-            let sportView = SportSelectorMenuCell()
+            let sportView = SportSelectorMenu()
             sportView.setSports(sportName: sport.sportName, sportImage: sport.sportImage)
-            sportView.onSelected = { [weak self] in
+            sportView.onTap = { [weak self] in
                 self?.handleSportSelection(at: index, targetView: sportView)
             }
             sportSelectorMenuStack.addArrangedSubview(sportView)
@@ -51,10 +49,11 @@ class ViewController: UIViewController {
         selectionIndicator.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         view.addSubview(selectionIndicator)
         
-        let firstCell = sportSelectorMenuStack.arrangedSubviews[0]
+        guard let firstCell = sportSelectorMenuStack.arrangedSubviews.first else {
+            return
+        }
         
         selectionIndicator.snp.makeConstraints{
-            
             $0.bottom.equalTo(sportSelectorMenuStack.snp.bottom)
             $0.centerX.equalTo(firstCell.snp.centerX)
             $0.height.equalTo(4)
@@ -62,12 +61,10 @@ class ViewController: UIViewController {
         }
     }
 
-
     private func setupTableView() {
         view.addSubview(tableView)
         tableView.dataSource = self
         tableView.delegate = self
-        
         
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: "MatchCell")
         tableView.register(LeagueHeaderView.self, forHeaderFooterViewReuseIdentifier: "LeagueHeader")
@@ -81,21 +78,30 @@ class ViewController: UIViewController {
         }
     }
 
-    private func loadData() {
-        self.sections = eventService.getGroupedEvents()
+    private func loadData(shouldShowData: Bool = true) {
+        if shouldShowData {
+            self.sections = eventService.getGroupedEvents()
+        } else {
+            self.sections = []
+        }
         tableView.reloadData()
     }
 
     private func handleSportSelection(at index: Int, targetView: UIView) {
-            selectionIndicator.snp.remakeConstraints{
-                $0.bottom.equalTo(sportSelectorMenuStack.snp.bottom)
-                $0.height.equalTo(4)
-                $0.centerX.equalTo(targetView.snp.centerX)
-                $0.leading.trailing.equalTo(targetView).inset(8)
-            }
+        selectionIndicator.snp.remakeConstraints{
+            $0.bottom.equalTo(sportSelectorMenuStack.snp.bottom)
+            $0.height.equalTo(4)
+            $0.centerX.equalTo(targetView.snp.centerX)
+            $0.leading.trailing.equalTo(targetView).inset(8)
         }
+        
+        UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
+            self.view.layoutIfNeeded()
+        }, completion: nil)
+        
+        loadData(shouldShowData: index == 0)
+    }
 }
-
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
@@ -108,22 +114,28 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MatchCell", for: indexPath) as! MatchTableViewCell
-        let match = sections[indexPath.section].events[indexPath.row]
-        
-        cell.configure(with: match)
-        return cell
+        if let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.reuseIdentifier, for: indexPath) as? MatchTableViewCell {
+            if sections.indices.contains(indexPath.section) {
+                let section = sections[indexPath.section]
+                if section.events.indices.contains(indexPath.row) {
+                    let match = section.events[indexPath.row]
+                    cell.configure(with: match)
+                }
+            }
+            return cell
+        }
+        return UITableViewCell()
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "LeagueHeader") as! LeagueHeaderView
-        let league = sections[section].league
-        header.leagueView.configure(
-            leagueLogo: league.name,
-            countryName: league.country?.name ?? "",
-            leagueName: league.name
-        )
-        return header
+        if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: LeagueHeaderView.reuseIdentifier) as? LeagueHeaderView {
+            if sections.indices.contains(section) {
+                let league = sections[section].league
+                header.configure(with: league)
+            }
+            return header
+        }
+        return nil
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
