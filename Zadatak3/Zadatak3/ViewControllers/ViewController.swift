@@ -4,6 +4,7 @@ import SofaAcademic
 
 class ViewController: UIViewController {
     
+    private let header = HeaderView()
     private var sportSelectorMenuStack = UIStackView()
     private let selectionIndicator = UIView()
     private let tableView = UITableView(frame: .zero, style: .plain)
@@ -16,10 +17,41 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .sofaBlue
         
+        setupHeader()
         setupSportSelector()
         setupIndicator()
         setupTableView()
         loadData(shouldShowData: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    private func setupHeader(){
+        
+        view.addSubview(header)
+        header.backgroundColor = .sofaBlue
+        
+        header.onSettingsTap = { [weak self] in
+            self?.showSettings()
+        }
+        
+        header.snp.makeConstraints{
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+    }
+    
+    private func showSettings(){
+        let settingsVC = SettingsVC()
+        self.navigationController?.pushViewController(settingsVC, animated: true)
     }
     
     private func setupSportSelector() {
@@ -29,7 +61,7 @@ class ViewController: UIViewController {
         sportSelectorMenuStack.backgroundColor = .sofaBlue
         
         sportSelectorMenuStack.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(header.snp.bottom)
             $0.leading.trailing.equalToSuperview()
         }
         
