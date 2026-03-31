@@ -98,6 +98,9 @@ class ViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
+        tableView.estimatedSectionHeaderHeight = 56
+        
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: "MatchCell")
         tableView.register(LeagueHeaderView.self, forHeaderFooterViewReuseIdentifier: "LeagueHeader")
         
@@ -176,6 +179,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
         return 8
     }
+    
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footerView = UIView()
@@ -191,6 +195,12 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
         
         return footerView
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let match = sections[indexPath.section].events[indexPath.row]
+        let detailsVC = EventDetailsVC(match: match)
+        navigationController?.pushViewController(detailsVC, animated: true)
+        
     }
 }
 
