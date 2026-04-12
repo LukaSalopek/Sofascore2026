@@ -41,6 +41,7 @@ class SettingsView : BaseView {
             $0.leading.equalTo(backIcon.snp.trailing).offset(32)
             $0.centerY.equalTo(backIcon)
             $0.height.equalTo(28)
+            $0.trailing.lessThanOrEqualToSuperview().offset(16)
         }
     }
     

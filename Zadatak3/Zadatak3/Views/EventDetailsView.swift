@@ -9,28 +9,29 @@ import UIKit
 import SnapKit
 import SofaAcademic
 
+import UIKit
+import SnapKit
+
 class EventDetailsView : BaseView {
     
     private var homeTeamCard = TeamCard()
-    private var awayTeamCard = TeamCard()
+    private var mainStack = UIStackView()
+    private var infoStack = UIStackView()
     
+    private var spacer = UIView()
     private var matchDate = UILabel()
     private var matchTime = UILabel()
     
+    private var scoreStackView = UIStackView()
     private var homeScoreLabel = UILabel()
     private var scoreSeparatorLabel = UILabel()
     private var awayScoreLabel = UILabel()
-    private var scoreStackView = UIStackView()
     
-    private var spacer = UIView()
     private var matchMinute = UILabel()
-    
-    private var infoStack = UIStackView()
-    private var mainStack = UIStackView()
+    private var awayTeamCard = TeamCard()
     
     override func addViews(){
         addSubview(mainStack)
-
         mainStack.addArrangedSubview(homeTeamCard)
         mainStack.addArrangedSubview(infoStack)
         mainStack.addArrangedSubview(awayTeamCard)
@@ -56,21 +57,26 @@ class EventDetailsView : BaseView {
         infoStack.alignment = .center
         infoStack.setCustomSpacing(4, after: matchDate)
         
+        matchDate.font = .systemFont(ofSize: 12)
+        matchTime.font = .systemFont(ofSize: 12)
+        
         scoreStackView.axis = .horizontal
         scoreStackView.spacing = 4
         scoreStackView.alignment = .center
+        scoreStackView.distribution = .fill
         
-        [homeScoreLabel, scoreSeparatorLabel, awayScoreLabel].forEach {
-            $0.font = .systemFont(ofSize: 32, weight: .bold)
-            $0.textAlignment = .center
-        }
+        homeScoreLabel.font = .systemFont(ofSize: 32, weight: .bold)
+        homeScoreLabel.textAlignment = .right
+            
+        scoreSeparatorLabel.font = .systemFont(ofSize: 32, weight: .bold)
+        scoreSeparatorLabel.textAlignment = .center
+        scoreSeparatorLabel.text = "-"
+            
+        awayScoreLabel.font = .systemFont(ofSize: 32, weight: .bold)
+        awayScoreLabel.textAlignment = .left
         
-        matchDate.font = .systemFont(ofSize: 12)
-        matchTime.font = .systemFont(ofSize: 12)
         matchMinute.font = .systemFont(ofSize: 12)
         matchMinute.textAlignment = .center
-        
-        scoreSeparatorLabel.text = "-"
     }
     
     override func setupConstraints(){
@@ -81,84 +87,92 @@ class EventDetailsView : BaseView {
         spacer.snp.makeConstraints{
             $0.height.equalTo(8)
         }
+        
         homeScoreLabel.snp.makeConstraints{
             $0.height.equalTo(40)
+            $0.leading.equalToSuperview()
         }
+        
         scoreSeparatorLabel.snp.makeConstraints{
+            $0.centerX.equalToSuperview()
             $0.height.equalTo(40)
         }
+        
         awayScoreLabel.snp.makeConstraints{
             $0.height.equalTo(40)
+            $0.trailing.equalToSuperview()
         }
+        
         matchMinute.snp.makeConstraints{
             $0.height.equalTo(16)
         }
     }
     
-    func configure(with match: Event) {
-        homeTeamCard.configure(teamName: match.homeTeam.name, image: match.homeTeamLogo )
-        awayTeamCard.configure(teamName: match.awayTeam.name, image: match.awayTeamLogo)
+    func configure(with model: EventDetailsDisplayModel) {
+        homeTeamCard.configure(teamName: model.homeTeamName, image: model.homeTeamLogo)
+        awayTeamCard.configure(teamName: model.awayTeamName, image: model.awayTeamLogo)
         
         homeTeamCard.updateNameColor(color: .sofaTextBlack)
         awayTeamCard.updateNameColor(color: .sofaTextBlack)
         
-        switch match.status {
-        case .inProgress:
-            showLiveUI(match: match)
-        case .notStarted:
-            showUpcomingUI(timestamp: match.startTimestamp)
-        case .finished:
-            showFinishedUI(match: match)
-        case .halftime:
-            showHalftimeUI(match: match)
+        switch model.state {
+        case .upcoming(let date, let time):
+            setupUpcomingUI(date: date, time: time)
+            
+        case .live(let homeTeamScore, let awayTeamScore, let minute):
+            setupLiveUI(homeScore: homeTeamScore, awayScore: awayTeamScore, minute: minute)
+            
+        case .halftime(let homeTeamScore, let awayTeamScore):
+            setupHalftimeUI(homeScore: homeTeamScore, awayScore: awayTeamScore)
+            
+        case .finished(let homeTeamScore, let awayTeamScore, let homeTeamColor, let awayTeamColor):
+            setupFinishedUI(homeScore: homeTeamScore, awayScore: awayTeamScore, homeColor: homeTeamColor, awayColor: awayTeamColor)
         }
     }
-    
-    private func showLiveUI(match: Event) {
+
+
+
+    private func setupLiveUI(homeScore: String, awayScore: String, minute: String) {
         toggleScoreUI(showScore: true)
-        homeScoreLabel.text = "\(match.homeTeamScore)"
-        awayScoreLabel.text = "\(match.awayTeamScore)"
+        homeScoreLabel.text = homeScore
+        awayScoreLabel.text = awayScore
         
         [homeScoreLabel, scoreSeparatorLabel, awayScoreLabel].forEach { $0.textColor = .sofaLiveRed }
         
-        matchMinute.text = "\(match.timeDifference)'"
+        matchMinute.text = minute
         matchMinute.textColor = .sofaLiveRed
     }
-    
-    private func showUpcomingUI(timestamp: Int) {
+
+    private func setupUpcomingUI(date: String, time: String) {
         toggleScoreUI(showScore: false)
-        let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy."
-        matchDate.text = formatter.string(from: date)
-        formatter.dateFormat = "HH:mm"
-        matchTime.text = formatter.string(from: date)
+        matchDate.text = date
+        matchTime.text = time
     }
-    
-    private func showFinishedUI(match: Event) {
+
+    private func setupFinishedUI(homeScore: String, awayScore: String, homeColor: UIColor, awayColor: UIColor) {
         toggleScoreUI(showScore: true)
-        homeScoreLabel.text = "\(match.homeTeamScore)"
-        awayScoreLabel.text = "\(match.awayTeamScore)"
+        homeScoreLabel.text = homeScore
+        awayScoreLabel.text = awayScore
         
-        let colors = ViewControllerHelper.getTeamColors(homeScore: match.homeTeamScore, awayScore: match.awayTeamScore)
-        homeScoreLabel.textColor = colors.home
-        awayScoreLabel.textColor = colors.away
+        homeScoreLabel.textColor = homeColor
+        awayScoreLabel.textColor = awayColor
         scoreSeparatorLabel.textColor = .sofaGray
         
         matchMinute.text = "Full Time"
         matchMinute.textColor = .sofaGray
     }
 
-    private func showHalftimeUI(match: Event) {
+    private func setupHalftimeUI(homeScore: String, awayScore: String) {
         toggleScoreUI(showScore: true)
-        homeScoreLabel.text = "\(match.homeTeamScore)"
-        awayScoreLabel.text = "\(match.awayTeamScore)"
+        homeScoreLabel.text = homeScore
+        awayScoreLabel.text = awayScore
         
         [homeScoreLabel, scoreSeparatorLabel, awayScoreLabel].forEach { $0.textColor = .sofaLiveRed }
-        matchMinute.text = AppStrings.halftime
+        
+        matchMinute.text = "Half Time"
         matchMinute.textColor = .sofaLiveRed
     }
-    
+
     private func toggleScoreUI(showScore: Bool) {
         scoreStackView.isHidden = !showScore
         matchMinute.isHidden = !showScore
@@ -166,57 +180,7 @@ class EventDetailsView : BaseView {
         matchDate.isHidden = showScore
         matchTime.isHidden = showScore
     }
+    
 }
 
-class TeamCard : UIView {
-    
-    private var teamName = UILabel()
-    private var teamIcon = UIImageView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        addViews()
-        setupStyles()
-        setupConstraints()
-    }
 
-    required init?(coder: NSCoder) { fatalError() }
-
-    private func addViews() {
-        addSubview(teamIcon)
-        addSubview(teamName)
-    }
-    
-    func setupStyles(){
-        teamName.font = .systemFont(ofSize: 12, weight: .bold)
-        teamName.textColor = .sofaTextBlack
-        teamName.numberOfLines = 2
-        teamName.lineBreakMode = .byTruncatingTail
-        teamName.textAlignment = .center
-        teamIcon.contentMode = .scaleAspectFit
-    }
-    
-    func setupConstraints(){
-        teamIcon.snp.makeConstraints{
-            $0.size.equalTo(40)
-            $0.leading.trailing.equalToSuperview().inset(28)
-            $0.top.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(40)
-        }
-        
-        teamName.snp.makeConstraints{
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.top.equalTo(teamIcon.snp.bottom).offset(8)
-            $0.centerX.equalTo(teamIcon)
-        }
-    }
-    
-    func configure(teamName : String, image : UIImage){
-        self.teamName.text = teamName
-        self.teamIcon.image = image
-    }
-
-    func updateNameColor(color: UIColor) {
-        self.teamName.textColor = color
-    }
-}

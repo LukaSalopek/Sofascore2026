@@ -63,7 +63,7 @@ class HeaderView : BaseView {
         self.settingsImage.isUserInteractionEnabled = true
     }
     
-    @objc func settingsTapped(){
+    @objc private func settingsTapped(){
         onSettingsTap?()
     }
     

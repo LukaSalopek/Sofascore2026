@@ -13,7 +13,7 @@ import SnapKit
 class EventDetailsHeader : BaseView {
     
     private var backButton = UIImageView()
-    private var leagueLogo = UIImageView()
+    private var leagueImage = UIImageView()
     private var infoLabel = UILabel()
     
     var isBackTapped: (() -> Void)?
@@ -21,7 +21,7 @@ class EventDetailsHeader : BaseView {
     
     override func addViews() {
         addSubview(backButton)
-        addSubview(leagueLogo)
+        addSubview(leagueImage)
         addSubview(infoLabel)
     }
  
@@ -43,14 +43,14 @@ class EventDetailsHeader : BaseView {
             $0.top.bottom.equalToSuperview().inset(12)
         }
         
-        leagueLogo.snp.makeConstraints{
-            $0.size.equalTo(24)
+        leagueImage.snp.makeConstraints{
+            $0.size.equalTo(16)
             $0.leading.equalTo(backButton.snp.trailing).offset(24)
             $0.centerY.equalTo(backButton)
         }
         
         infoLabel.snp.makeConstraints{
-            $0.leading.equalTo(leagueLogo.snp.trailing).offset(8)
+            $0.leading.equalTo(leagueImage.snp.trailing).offset(8)
             $0.centerY.equalTo(backButton)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
         }
@@ -60,6 +60,11 @@ class EventDetailsHeader : BaseView {
         let tap = UITapGestureRecognizer(target: self, action: #selector(backTapped))
         backButton.addGestureRecognizer(tap)
         backButton.isUserInteractionEnabled = true
+    }
+    
+    func configure(leagueLogo: UIImage, sport: String, country: String, leagueName: String){
+        infoLabel.text = sport + ", " + country + ", " + leagueName
+        leagueImage.image = leagueLogo
     }
     
     @objc func backTapped(){

@@ -8,6 +8,7 @@ class ViewController: UIViewController {
     private var sportSelectorMenuStack = UIStackView()
     private let selectionIndicator = UIView()
     private let tableView = UITableView(frame: .zero, style: .plain)
+    private var currentSportName: String = "Football"
     
     private var sports = SportSelectorMenuModel.sportSelectorMenuData
     private var sections: [Section] = []
@@ -51,7 +52,8 @@ class ViewController: UIViewController {
     
     private func showSettings(){
         let settingsVC = SettingsVC()
-        self.navigationController?.pushViewController(settingsVC, animated: true)
+        settingsVC.modalPresentationStyle = .fullScreen
+        self.present(settingsVC, animated: true)
     }
     
     private func setupSportSelector() {
@@ -101,8 +103,8 @@ class ViewController: UIViewController {
         tableView.sectionHeaderHeight = UITableView.automaticDimension
         tableView.estimatedSectionHeaderHeight = 56
         
-        tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: "MatchCell")
-        tableView.register(LeagueHeaderView.self, forHeaderFooterViewReuseIdentifier: "LeagueHeader")
+        tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.reuseIdentifier)
+        tableView.register(LeagueHeaderView.self, forHeaderFooterViewReuseIdentifier: LeagueHeaderView.reuseIdentifier)
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
@@ -129,6 +131,7 @@ class ViewController: UIViewController {
             $0.centerX.equalTo(targetView.snp.centerX)
             $0.leading.trailing.equalTo(targetView).inset(8)
         }
+        self.currentSportName=sports[index].sportName
         
         UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
             self.view.layoutIfNeeded()
@@ -197,10 +200,15 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         return footerView
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard sections.indices.contains(indexPath.section),
+              sections[indexPath.section].events.indices.contains(indexPath.row)
+        else {
+            return
+        }
         let match = sections[indexPath.section].events[indexPath.row]
-        let detailsVC = EventDetailsVC(match: match)
-        navigationController?.pushViewController(detailsVC, animated: true)
         
+        let detailsVC = EventDetailsVC(match: match, sportName: self.currentSportName)
+        navigationController?.pushViewController(detailsVC, animated: true)
     }
 }
 
