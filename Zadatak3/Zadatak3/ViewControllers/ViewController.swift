@@ -4,9 +4,11 @@ import SofaAcademic
 
 class ViewController: UIViewController {
     
+    private let header = HeaderView()
     private var sportSelectorMenuStack = UIStackView()
     private let selectionIndicator = UIView()
     private let tableView = UITableView(frame: .zero, style: .plain)
+    private var currentSportName: String = "Football"
     
     private var sports = SportSelectorMenuModel.sportSelectorMenuData
     private var sections: [Section] = []
@@ -16,10 +18,42 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .sofaBlue
         
+        setupHeader()
         setupSportSelector()
         setupIndicator()
         setupTableView()
         loadData(shouldShowData: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    private func setupHeader(){
+        
+        view.addSubview(header)
+        header.backgroundColor = .sofaBlue
+        
+        header.onSettingsTap = { [weak self] in
+            self?.showSettings()
+        }
+        
+        header.snp.makeConstraints{
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+        }
+    }
+    
+    private func showSettings(){
+        let settingsVC = SettingsVC()
+        settingsVC.modalPresentationStyle = .fullScreen
+        self.present(settingsVC, animated: true)
     }
     
     private func setupSportSelector() {
@@ -29,7 +63,7 @@ class ViewController: UIViewController {
         sportSelectorMenuStack.backgroundColor = .sofaBlue
         
         sportSelectorMenuStack.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(header.snp.bottom)
             $0.leading.trailing.equalToSuperview()
         }
         
@@ -66,8 +100,11 @@ class ViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: "MatchCell")
-        tableView.register(LeagueHeaderView.self, forHeaderFooterViewReuseIdentifier: "LeagueHeader")
+        tableView.sectionHeaderHeight = UITableView.automaticDimension
+        tableView.estimatedSectionHeaderHeight = 56
+        
+        tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.reuseIdentifier)
+        tableView.register(LeagueHeaderView.self, forHeaderFooterViewReuseIdentifier: LeagueHeaderView.reuseIdentifier)
         
         tableView.separatorStyle = .none
         tableView.sectionHeaderTopPadding = 0
@@ -94,6 +131,7 @@ class ViewController: UIViewController {
             $0.centerX.equalTo(targetView.snp.centerX)
             $0.leading.trailing.equalTo(targetView).inset(8)
         }
+        self.currentSportName=sports[index].sportName
         
         UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
             self.view.layoutIfNeeded()
@@ -144,6 +182,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
         return 8
     }
+    
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footerView = UIView()
@@ -159,6 +198,17 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
         
         return footerView
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard sections.indices.contains(indexPath.section),
+              sections[indexPath.section].events.indices.contains(indexPath.row)
+        else {
+            return
+        }
+        let match = sections[indexPath.section].events[indexPath.row]
+        
+        let detailsVC = EventDetailsVC(match: match, sportName: self.currentSportName)
+        navigationController?.pushViewController(detailsVC, animated: true)
     }
 }
 

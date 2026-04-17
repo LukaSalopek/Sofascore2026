@@ -24,15 +24,35 @@ final class EventService {
         let sections = grouped.compactMap { (key, events) -> Section? in
             guard let firstLeague = events.first?.league else { return nil }
 
-            let sortedEventsForLeague = events.sorted {
-                if $0.status == .inProgress && $1.status != .inProgress { return true }
-                if $0.status != .inProgress && $1.status == .inProgress { return false }
-                return $0.startTimestamp < $1.startTimestamp
+            let sortedEventsForLeague = events.sorted { event1, event2 in
+                let priority1 = self.priority(for: event1.status)
+                let priority2 = self.priority(for: event2.status)
+
+                if priority1 != priority2 {
+                    return priority1 < priority2
+                }
+                
+                if event1.status == .finished {
+                    return event1.startTimestamp > event2.startTimestamp
+                } else {
+                    return event1.startTimestamp < event2.startTimestamp
+                }
             }
             
             return Section(league: firstLeague, events: sortedEventsForLeague)
         }
 
         return sections.sorted(by: { $0.league.name < $1.league.name })
+    }
+
+    private func priority(for status: EventStatus) -> Int {
+        switch status {
+        case .finished:
+            return 1
+        case .inProgress, .halftime:
+            return 2
+        case .notStarted:
+            return 3
+        }
     }
 }
