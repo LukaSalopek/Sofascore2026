@@ -181,6 +181,13 @@ class EventDetailsView : BaseView {
         matchTime.isHidden = showScore
     }
     
+    func updateLogos(
+        homeLogo: UIImage,
+        awayLogo: UIImage
+    ) {
+        homeTeamCard.updateImage(image: homeLogo)
+        awayTeamCard.updateImage(image: awayLogo)
+    }
 }
 
 

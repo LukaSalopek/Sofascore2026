@@ -9,17 +9,34 @@
 import UIKit
 
 struct SportSelectorMenuModel {
-    let id : Int
-    var sportName : String
-    var sportImage : UIImage
-    
-    static let sportSelectorMenuData : [SportSelectorMenuModel] = [
-        SportSelectorMenuModel(id: 1, sportName: "Football", sportImage: UIImage(named: "icon_football") ?? UIImage()),
-        SportSelectorMenuModel(id: 2, sportName: "Basketball", sportImage: UIImage(named: "icon_basketball") ?? UIImage()),
-        SportSelectorMenuModel(id: 3, sportName: "Am. Football", sportImage: UIImage(named: "icon_american_football") ?? UIImage())
-                               
+
+    let id: Int
+    let sportName: String
+    let sportImage: UIImage
+    let slug: String
+
+    static let sportSelectorMenuData: [SportSelectorMenuModel] = [
+
+        SportSelectorMenuModel(
+            id: 1,
+            sportName: "Football",
+            sportImage: UIImage(named: "icon_football") ?? UIImage(),
+            slug: "football"
+        ),
+
+        SportSelectorMenuModel(
+            id: 2,
+            sportName: "Basketball",
+            sportImage: UIImage(named: "icon_basketball") ?? UIImage(),
+            slug: "basketball"
+        ),
+
+        SportSelectorMenuModel(
+            id: 3,
+            sportName: "Am. Football",
+            sportImage: UIImage(named: "icon_american_football") ?? UIImage(),
+            slug: "am-football"
+        )
     ]
 }
-
-
 

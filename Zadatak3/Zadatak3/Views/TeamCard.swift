@@ -53,4 +53,7 @@ class TeamCard : BaseView{
     func updateNameColor(color: UIColor) {
         self.teamName.textColor = color
     }
+    func updateImage(image: UIImage) {
+        teamIcon.image = image
+    }
 }

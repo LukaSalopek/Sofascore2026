@@ -16,41 +16,62 @@ struct Section {
 
 final class EventService {
 
-    private let allEvents = Homework3DataSource().events()
+    func getGroupedEvents(
+        sport: String
+    ) async throws -> [Section] {
 
-    func getGroupedEvents() -> [Section] {
-        let grouped = Dictionary(grouping: allEvents, by: { $0.league?.id ?? 0 })
+        let allEvents = try await APIClient.shared.fetchEvents(
+            sport: sport
+        )
 
-        let sections = grouped.compactMap { (key, events) -> Section? in
-            guard let firstLeague = events.first?.league else { return nil }
+        let grouped = Dictionary(
+            grouping: allEvents,
+            by: { $0.league?.id ?? 0 }
+        )
 
-            let sortedEventsForLeague = events.sorted { event1, event2 in
+        let sections = grouped.compactMap { (_, events) -> Section? in
+
+            guard let firstLeague = events.first?.league else {
+                return nil
+            }
+
+            let sortedEvents = events.sorted { event1, event2 in
+
                 let priority1 = self.priority(for: event1.status)
                 let priority2 = self.priority(for: event2.status)
 
                 if priority1 != priority2 {
                     return priority1 < priority2
                 }
-                
+
                 if event1.status == .finished {
                     return event1.startTimestamp > event2.startTimestamp
-                } else {
-                    return event1.startTimestamp < event2.startTimestamp
                 }
+
+                return event1.startTimestamp < event2.startTimestamp
             }
-            
-            return Section(league: firstLeague, events: sortedEventsForLeague)
+
+            return Section(
+                league: firstLeague,
+                events: sortedEvents
+            )
         }
 
-        return sections.sorted(by: { $0.league.name < $1.league.name })
+        return sections.sorted {
+            $0.league.name < $1.league.name
+        }
     }
 
     private func priority(for status: EventStatus) -> Int {
+
         switch status {
+
         case .finished:
             return 1
+
         case .inProgress, .halftime:
             return 2
+
         case .notStarted:
             return 3
         }
