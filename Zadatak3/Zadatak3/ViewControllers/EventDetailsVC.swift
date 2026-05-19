@@ -2,62 +2,97 @@
 //  EventDetailsVC.swift
 //  Zadatak3
 //
-//  Created by akademija on 29.03.2026..
-//
 
 import UIKit
 import SnapKit
 import SofaAcademic
 
 class EventDetailsVC: UIViewController {
+    
     private let match: Event
     private let sport: String
+    
     private let contentView = EventDetailsView()
     private let header = EventDetailsHeader()
 
     init(match: Event, sportName: String) {
         self.match = match
         self.sport = sportName
+        
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         navigationController?.setNavigationBarHidden(true, animated: true)
     }
        
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.backgroundColor = .white
+        
         view.addSubview(contentView)
+        
         setupHeader()
         setupConstraints()
         
         let displayModel = EventDetailsMapper.map(match: match)
+        
         contentView.configure(with: displayModel)
+        
+        Task {
+            let homeLogo = await APIClient.shared.fetchImage(
+                from: displayModel.homeTeamLogoURL
+            )
+            
+            let awayLogo = await APIClient.shared.fetchImage(
+                from: displayModel.awayTeamLogoURL
+            )
+            
+            await MainActor.run {
+                self.contentView.updateLogos(
+                    homeLogo: homeLogo ?? UIImage(),
+                    awayLogo: awayLogo ?? UIImage()
+                )
+            }
+        }
     }
     
     private func setupHeader() {
         header.backgroundColor = .white
+        
         view.addSubview(header)
         
         header.isBackTapped = { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
         
-        header.configure(
-            leagueLogo: UIImage(named: match.league?.name.toCamelCase() ?? "") ?? UIImage(),
-            sport: self.sport,
-            country: match.league?.country?.name ?? "",
-            leagueName: match.league?.name ?? ""
-        )
+        Task {
+            let image = await APIClient.shared.fetchImage(
+                from: match.league?.logoUrl
+            )
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.header.configure(
+                    leagueLogo: image ?? UIImage(),
+                    sport: self?.sport ?? "",
+                    country: self?.match.league?.country?.name ?? "",
+                    leagueName: self?.match.league?.name ?? ""
+                )
+            }
+        }
     }
 
     private func setupConstraints() {

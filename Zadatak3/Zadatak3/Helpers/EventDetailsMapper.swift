@@ -1,20 +1,26 @@
 //
-//  Untitled.swift
+//  EventDetailsMapper.swift
 //  Zadatak3
-//
-//  Created by akademija on 11.04.2026..
 //
 
 import UIKit
-import SofaAcademic
 
 class EventDetailsMapper {
     
+    private static let dayFormatter : DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy."
+        return formatter
+    }()
+    
     static func map(match: Event) -> EventDetailsDisplayModel {
+        
         let state: EventDetailsDisplayModel.State
         
         switch match.status {
+            
         case .inProgress:
+            
             state = .live(
                 homeScore: "\(match.homeTeamScore)",
                 awayScore: "\(match.awayTeamScore)",
@@ -22,10 +28,12 @@ class EventDetailsMapper {
             )
             
         case .notStarted:
+            
             let interval = TimeInterval(match.startTimestamp)
-            let date = SofaDateFormatter.shared.dateFormat(interval: interval)
-            let dayFormatter = DateFormatter()
-            dayFormatter.dateFormat = "dd.MM.yyyy."
+            
+            let date = SofaDateFormatter.shared.dateFormat(
+                interval: interval
+            )
             
             state = .upcoming(
                 date: dayFormatter.string(from: date),
@@ -33,7 +41,12 @@ class EventDetailsMapper {
             )
             
         case .finished:
-            let colors = ViewControllerHelper.getTeamColors(homeScore: match.homeTeamScore, awayScore: match.awayTeamScore)
+            
+            let colors = ViewControllerHelper.getTeamColors(
+                homeScore: match.homeTeamScore,
+                awayScore: match.awayTeamScore
+            )
+            
             state = .finished(
                 homeScore: "\(match.homeTeamScore)",
                 awayScore: "\(match.awayTeamScore)",
@@ -42,6 +55,7 @@ class EventDetailsMapper {
             )
             
         case .halftime:
+            
             state = .halftime(
                 homeScore: "\(match.homeTeamScore)",
                 awayScore: "\(match.awayTeamScore)"
@@ -51,8 +65,8 @@ class EventDetailsMapper {
         return EventDetailsDisplayModel(
             homeTeamName: match.homeTeam.name,
             awayTeamName: match.awayTeam.name,
-            homeTeamLogo: match.homeTeamLogo,
-            awayTeamLogo: match.awayTeamLogo,
+            homeTeamLogoURL: match.homeTeam.logoUrl,
+            awayTeamLogoURL: match.awayTeam.logoUrl,
             state: state
         )
     }

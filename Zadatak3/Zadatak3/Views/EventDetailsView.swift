@@ -109,26 +109,56 @@ class EventDetailsView : BaseView {
     }
     
     func configure(with model: EventDetailsDisplayModel) {
-        homeTeamCard.configure(teamName: model.homeTeamName, image: model.homeTeamLogo)
-        awayTeamCard.configure(teamName: model.awayTeamName, image: model.awayTeamLogo)
-        
-        homeTeamCard.updateNameColor(color: .sofaTextBlack)
-        awayTeamCard.updateNameColor(color: .sofaTextBlack)
-        
-        switch model.state {
-        case .upcoming(let date, let time):
-            setupUpcomingUI(date: date, time: time)
+            homeTeamCard.configure(teamName: model.homeTeamName, image: UIImage())
+            awayTeamCard.configure(teamName: model.awayTeamName, image: UIImage())
             
-        case .live(let homeTeamScore, let awayTeamScore, let minute):
-            setupLiveUI(homeScore: homeTeamScore, awayScore: awayTeamScore, minute: minute)
+        loadImage(from: model.homeTeamLogoURL ?? "") { [weak self] image in
+                self?.homeTeamCard.updateImage(image: image ?? UIImage())
+            }
             
-        case .halftime(let homeTeamScore, let awayTeamScore):
-            setupHalftimeUI(homeScore: homeTeamScore, awayScore: awayTeamScore)
+        loadImage(from: model.awayTeamLogoURL ?? "") { [weak self] image in
+                self?.awayTeamCard.updateImage(image: image ?? UIImage())
+            }
             
-        case .finished(let homeTeamScore, let awayTeamScore, let homeTeamColor, let awayTeamColor):
-            setupFinishedUI(homeScore: homeTeamScore, awayScore: awayTeamScore, homeColor: homeTeamColor, awayColor: awayTeamColor)
+            homeTeamCard.updateNameColor(color: .sofaTextBlack)
+            awayTeamCard.updateNameColor(color: .sofaTextBlack)
+            
+            switch model.state {
+            case .upcoming(let date, let time):
+                setupUpcomingUI(date: date, time: time)
+                
+            case .live(let homeTeamScore, let awayTeamScore, let minute):
+                setupLiveUI(homeScore: homeTeamScore, awayScore: awayTeamScore, minute: minute)
+                
+            case .halftime(let homeTeamScore, let awayTeamScore):
+                setupHalftimeUI(homeScore: homeTeamScore, awayScore: awayTeamScore)
+                
+            case .finished(let homeTeamScore, let awayTeamScore, let homeTeamColor, let awayTeamColor):
+                setupFinishedUI(homeScore: homeTeamScore, awayScore: awayTeamScore, homeColor: homeTeamColor, awayColor: awayTeamColor)
+            }
         }
-    }
+        
+        private func loadImage(from urlString: String, completion: @escaping (UIImage?) -> Void) {
+            guard let url = URL(string: urlString) else {
+                completion(nil)
+                return
+            }
+            
+            URLSession.shared.dataTask(with: url) { data, _, error in
+                guard error == nil,
+                      let data = data,
+                      let image = UIImage(data: data) else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+            }.resume()
+        }
 
 
 
@@ -181,6 +211,13 @@ class EventDetailsView : BaseView {
         matchTime.isHidden = showScore
     }
     
+    func updateLogos(
+        homeLogo: UIImage,
+        awayLogo: UIImage
+    ) {
+        homeTeamCard.updateImage(image: homeLogo)
+        awayTeamCard.updateImage(image: awayLogo)
+    }
 }
 
 

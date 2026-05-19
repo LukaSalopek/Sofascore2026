@@ -2,8 +2,6 @@
 //  LeagueView.swift
 //  Zadatak3
 //
-//  Created by akademija on 18.03.2026..
-//
 
 import SofaAcademic
 import UIKit
@@ -11,10 +9,10 @@ import SnapKit
 
 class LeagueView: BaseView {
     
-    private var leagueLogo = UIImageView()
-    private var countryName = UILabel()
-    private var littleIcon = UIImageView()
-    private var leagueName = UILabel()
+    private let leagueLogo = UIImageView()
+    private let countryName = UILabel()
+    private let littleIcon = UIImageView()
+    private let leagueName = UILabel()
     
     override func addViews() {
         addSubview(leagueLogo)
@@ -24,6 +22,8 @@ class LeagueView: BaseView {
     }
 
     override func styleViews() {
+        leagueLogo.contentMode = .scaleAspectFit
+        
         countryName.font = .sofaLeagueCountry
         countryName.textColor = .sofaTextBlack
         countryName.numberOfLines = 1
@@ -46,9 +46,8 @@ class LeagueView: BaseView {
         }
         
         countryName.snp.makeConstraints {
-            $0.leading.equalTo(leagueLogo.snp.trailing).offset(32)
+            $0.leading.equalTo(leagueLogo.snp.trailing).offset(12)
             $0.centerY.equalTo(leagueLogo.snp.centerY)
-            $0.height.equalTo(16)
         }
         
         littleIcon.snp.makeConstraints {
@@ -62,12 +61,15 @@ class LeagueView: BaseView {
             $0.leading.equalTo(littleIcon.snp.trailing).offset(9)
             $0.centerY.equalTo(leagueLogo.snp.centerY)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
-            $0.height.equalTo(16)
         }
     }
     
-    func configure(leagueLogo: String, countryName: String, leagueName: String) {
-        self.leagueLogo.image = UIImage(named: leagueLogo.toCamelCase())
+    func configure(
+        countryName: String,
+        leagueName: String,
+        leagueLogo: UIImage
+    ) {
+        self.leagueLogo.image = leagueLogo
         self.countryName.text = countryName
         self.leagueName.text = leagueName
     }

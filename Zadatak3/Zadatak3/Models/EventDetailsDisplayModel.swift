@@ -10,8 +10,8 @@ import UIKit
 struct EventDetailsDisplayModel {
     let homeTeamName: String
     let awayTeamName: String
-    let homeTeamLogo: UIImage
-    let awayTeamLogo: UIImage
+    let homeTeamLogoURL: String?
+    let awayTeamLogoURL: String?
     let state: State
 
     enum State {
