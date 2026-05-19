@@ -5,11 +5,11 @@
 
 import UIKit
 import SnapKit
-import SofaAcademic
 
 class LeagueHeaderView: UITableViewHeaderFooterView {
     
     private let leagueView = LeagueView()
+    private var currentImageLoadTask: Task<Void, Never>?
     
     static let reuseIdentifier = "LeagueHeader"
 
@@ -27,23 +27,30 @@ class LeagueHeaderView: UITableViewHeaderFooterView {
         fatalError()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        currentImageLoadTask?.cancel()
+    }
+    
     func configure(with league: League) {
+        currentImageLoadTask?.cancel()
+        
         leagueView.configure(
             countryName: league.country?.name ?? "",
             leagueName: league.name,
             leagueLogo: UIImage()
         )
         
-        Task {
+        currentImageLoadTask = Task { @MainActor in
             let image = await APIClient.shared.fetchImage(from: league.logoUrl)
             
-            DispatchQueue.main.async { [weak self] in
-                self?.leagueView.configure(
-                    countryName: league.country?.name ?? "",
-                    leagueName: league.name,
-                    leagueLogo: image ?? UIImage()
-                )
-            }
+            guard !Task.isCancelled else { return }
+            
+            self.leagueView.configure(
+                countryName: league.country?.name ?? "",
+                leagueName: league.name,
+                leagueLogo: image ?? UIImage()
+            )
         }
     }
 }

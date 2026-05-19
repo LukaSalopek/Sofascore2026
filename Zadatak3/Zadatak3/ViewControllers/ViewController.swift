@@ -1,3 +1,8 @@
+//
+//  ViewController.swift
+//  Zadatak3
+//
+
 import UIKit
 import SnapKit
 import SofaAcademic
@@ -10,11 +15,17 @@ class ViewController: UIViewController {
     private let tableView = UITableView(frame: .zero, style: .plain)
 
     private var currentSportName: String = "Football"
+    private var currentSportSlug: String = "football"
 
     private var sports = SportSelectorMenuModel.sportSelectorMenuData
     private var sections: [Section] = []
 
     private let eventService = EventService()
+    
+    private var currentLoadingTask: Task<Void, Never>?
+    
+    private var imageCache: [String: UIImage] = [:]
+    private let imageCacheQueue = DispatchQueue(label: "imageCacheQueue", attributes: .concurrent)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -95,7 +106,8 @@ class ViewController: UIViewController {
             )
 
             sportView.onTap = { [weak self] in
-                self?.handleSportSelection(
+                guard let self = self else { return }
+                self.handleSportSelection(
                     at: index,
                     targetView: sportView
                 )
@@ -161,24 +173,62 @@ class ViewController: UIViewController {
     }
 
     private func loadData(sport: String) {
-
-        Task {
-
+        currentLoadingTask?.cancel()
+        
+        currentLoadingTask = Task { @MainActor in
+            let currentSport = sport
+            
             do {
-
-                let sections = try await eventService
-                    .getGroupedEvents(sport: sport)
-
-                self.sections = sections
-
-                DispatchQueue.main.async {
+                let sections = try await eventService.getGroupedEvents(sport: currentSport)
+                
+                guard !Task.isCancelled else { return }
+                
+                if self.currentSportSlug == currentSport {
+                    self.sections = sections
                     self.tableView.reloadData()
+                    self.preloadImages(for: sections)
                 }
-
             } catch {
-                print(error)
+                if !Task.isCancelled {
+                    print(error)
+                }
             }
         }
+    }
+    
+    private func preloadImages(for sections: [Section]) {
+        for section in sections {
+            for event in section.events {
+                if let homeUrl = event.homeTeam.logoUrl, imageCache[homeUrl] == nil {
+                    Task {
+                        let image = await APIClient.shared.fetchImage(from: homeUrl)
+                        if let image {
+                            imageCacheQueue.async(flags: .barrier) {
+                                self.imageCache[homeUrl] = image
+                            }
+                        }
+                    }
+                }
+                
+                if let awayUrl = event.awayTeam.logoUrl, imageCache[awayUrl] == nil {
+                    Task {
+                        let image = await APIClient.shared.fetchImage(from: awayUrl)
+                        if let image {
+                            imageCacheQueue.async(flags: .barrier) {
+                                self.imageCache[awayUrl] = image
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func getCachedImage(for urlString: String?) -> UIImage {
+        guard let urlString, let image = imageCache[urlString] else {
+            return UIImage()
+        }
+        return image
     }
 
     private func handleSportSelection(
@@ -204,6 +254,7 @@ class ViewController: UIViewController {
         let selectedSport = sports[index]
 
         currentSportName = selectedSport.sportName
+        currentSportSlug = selectedSport.slug
 
         loadData(sport: selectedSport.slug)
     }
@@ -237,10 +288,12 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
 
-        let match = sections[indexPath.section]
-            .events[indexPath.row]
+        let match = sections[indexPath.section].events[indexPath.row]
+        
+        let homeLogo = getCachedImage(for: match.homeTeam.logoUrl)
+        let awayLogo = getCachedImage(for: match.awayTeam.logoUrl)
 
-        cell.configure(with: match)
+        cell.configure(with: match, homeLogo: homeLogo, awayLogo: awayLogo)
 
         return cell
     }

@@ -5,7 +5,6 @@
 
 import UIKit
 import SnapKit
-import SofaAcademic
 
 class MatchTableViewCell: UITableViewCell {
     
@@ -33,6 +32,8 @@ class MatchTableViewCell: UITableViewCell {
         super.prepareForReuse()
         
         matchView.updateScore(homeScore: "", awayScore: "")
+        matchView.updateHomeLogo(homeTeam: UIImage())
+        matchView.updateAwayLogo(awayTeam: UIImage())
         
         resetMatchViewStyles()
     }
@@ -47,7 +48,7 @@ class MatchTableViewCell: UITableViewCell {
         matchView.updateTimeColor(color: .sofaGray)
     }
 
-    func configure(with match: Event) {
+    func configure(with match: Event, homeLogo: UIImage, awayLogo: UIImage) {
         resetMatchViewStyles()
         
         matchView.setMatch(
@@ -56,27 +57,10 @@ class MatchTableViewCell: UITableViewCell {
             matchTime: match.formattedStartTime
         )
         
-        configureMatchStatus(match)
+        matchView.updateHomeLogo(homeTeam: homeLogo)
+        matchView.updateAwayLogo(awayTeam: awayLogo)
         
-        Task {
-            let homeLogo = await APIClient.shared.fetchImage(
-                from: match.homeTeam.logoUrl
-            )
-            
-            let awayLogo = await APIClient.shared.fetchImage(
-                from: match.awayTeam.logoUrl
-            )
-            
-            DispatchQueue.main.async { [weak self] in
-                self?.matchView.updateHomeLogo(
-                    homeTeam: homeLogo ?? UIImage()
-                )
-                
-                self?.matchView.updateAwayLogo(
-                    awayTeam: awayLogo ?? UIImage()
-                )
-            }
-        }
+        configureMatchStatus(match)
     }
 
     private func configureMatchStatus(_ match: Event) {

@@ -7,7 +7,6 @@
 
 
 import Foundation
-import SofaAcademic
 
 struct Section {
     let league: League

@@ -8,9 +8,4 @@
 public struct LoginResponse: Codable {
     public let name: String
     public let token: String
-    
-    public init(name: String, token: String) {
-        self.name = name
-        self.token = token
-    }
 }

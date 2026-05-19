@@ -16,28 +16,4 @@ public struct Event: Codable {
     public let awayScore: Int?
     public let round: Int?
     public let incidents: [Incident]?
-    
-    public init(
-        id: Int,
-        homeTeam: Team,
-        awayTeam: Team,
-        startTimestamp: Int,
-        status: EventStatus,
-        league: League,
-        homeScore: Int? = nil,
-        awayScore: Int? = nil,
-        round: Int,
-        incidents: [Incident]? = nil
-    ) {
-        self.id = id
-        self.homeTeam = homeTeam
-        self.awayTeam = awayTeam
-        self.startTimestamp = startTimestamp
-        self.status = status
-        self.league = league
-        self.homeScore = homeScore
-        self.awayScore = awayScore
-        self.round = round
-        self.incidents = incidents
-    }
 }

@@ -4,9 +4,14 @@
 //
 
 import UIKit
-import SofaAcademic
 
 class EventDetailsMapper {
+    
+    private static let dayFormatter : DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy."
+        return formatter
+    }()
     
     static func map(match: Event) -> EventDetailsDisplayModel {
         
@@ -29,9 +34,6 @@ class EventDetailsMapper {
             let date = SofaDateFormatter.shared.dateFormat(
                 interval: interval
             )
-            
-            let dayFormatter = DateFormatter()
-            dayFormatter.dateFormat = "dd.MM.yyyy."
             
             state = .upcoming(
                 date: dayFormatter.string(from: date),
@@ -63,8 +65,8 @@ class EventDetailsMapper {
         return EventDetailsDisplayModel(
             homeTeamName: match.homeTeam.name,
             awayTeamName: match.awayTeam.name,
-            homeTeamLogo: UIImage(),
-            awayTeamLogo: UIImage(),
+            homeTeamLogoURL: match.homeTeam.logoUrl,
+            awayTeamLogoURL: match.awayTeam.logoUrl,
             state: state
         )
     }

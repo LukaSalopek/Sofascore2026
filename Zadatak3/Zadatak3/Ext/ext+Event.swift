@@ -5,7 +5,6 @@
 //  Created by akademija on 18.03.2026..
 //
 
-import SofaAcademic
 import UIKit
 
 extension Event {

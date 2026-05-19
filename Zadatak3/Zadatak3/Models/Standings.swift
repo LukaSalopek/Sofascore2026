@@ -17,18 +17,4 @@ public struct Standings: Codable {
     public let scoreFor: Int?
     public let scoreAgainst: Int?
     public let scoreFormatted: String?
-    
-    public init(team: Team, position: Int, matches: Int, wins: Int, losses: Int, draws: Int, points: Int, percentage: Double?, scoreFor: Int?, scoreAgainst: Int?, scoreFormatted: String?) {
-        self.team = team
-        self.position = position
-        self.matches = matches
-        self.wins = wins
-        self.losses = losses
-        self.draws = draws
-        self.points = points
-        self.percentage = percentage
-        self.scoreFor = scoreFor
-        self.scoreAgainst = scoreAgainst
-        self.scoreFormatted = scoreFormatted
-    }
 }

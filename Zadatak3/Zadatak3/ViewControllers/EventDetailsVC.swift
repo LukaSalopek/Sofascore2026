@@ -51,6 +51,23 @@ class EventDetailsVC: UIViewController {
         let displayModel = EventDetailsMapper.map(match: match)
         
         contentView.configure(with: displayModel)
+        
+        Task {
+            let homeLogo = await APIClient.shared.fetchImage(
+                from: displayModel.homeTeamLogoURL
+            )
+            
+            let awayLogo = await APIClient.shared.fetchImage(
+                from: displayModel.awayTeamLogoURL
+            )
+            
+            await MainActor.run {
+                self.contentView.updateLogos(
+                    homeLogo: homeLogo ?? UIImage(),
+                    awayLogo: awayLogo ?? UIImage()
+                )
+            }
+        }
     }
     
     private func setupHeader() {
@@ -73,25 +90,6 @@ class EventDetailsVC: UIViewController {
                     sport: self?.sport ?? "",
                     country: self?.match.league?.country?.name ?? "",
                     leagueName: self?.match.league?.name ?? ""
-                )
-            }
-        }
-        
-        Task {
-            
-            let homeLogo = await APIClient.shared.fetchImage(
-                from: match.homeTeam.logoUrl
-            )
-            
-            let awayLogo = await APIClient.shared.fetchImage(
-                from: match.awayTeam.logoUrl
-            )
-            
-            DispatchQueue.main.async { [weak self] in
-                
-                self?.contentView.updateLogos(
-                    homeLogo: homeLogo ?? UIImage(),
-                    awayLogo: awayLogo ?? UIImage()
                 )
             }
         }
