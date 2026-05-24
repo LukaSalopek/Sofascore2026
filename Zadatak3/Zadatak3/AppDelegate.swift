@@ -13,28 +13,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        try? DatabaseManager.shared.setup()
         window = UIWindow(frame: UIScreen.main.bounds)
         
-        let loginVC = LoginVC()
-        let navVC = UINavigationController(rootViewController: loginVC)
-        window?.rootViewController = navVC
+        let rootVC: UIViewController
+        if AuthManager.shared.isLoggedIn {
+            rootVC = ViewController()
+        } else {
+            rootVC = LoginVC()
+        }
+        
+        let navController = UINavigationController(rootViewController: rootVC)
+        window?.rootViewController = navController
         window?.makeKeyAndVisible()
         
         return true
-    }
-    
-    private func getInitialViewController() -> UIViewController {
-        if AuthManager.shared.isLoggedIn {
-            return ViewController()
-        } else {
-            return LoginVC()
-        }
-    }
-    
-    func checkAuthAndSetRoot() {
-        let rootVC = getInitialViewController()
-        let navVC = UINavigationController(rootViewController: rootVC)
-        window?.rootViewController = navVC
-        window?.makeKeyAndVisible()
     }
 }

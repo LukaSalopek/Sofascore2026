@@ -5,7 +5,6 @@
 //  Created by akademija on 29.03.2026..
 //
 
-
 import UIKit
 import SnapKit
 
@@ -15,11 +14,14 @@ class SettingsVC: UIViewController {
     private let backgroundFill = UIView()
     
     private let userInfoLabel = UILabel()
+    private let eventCountLabel = UILabel()
+    private let leagueCountLabel = UILabel()
     private let logoutButton = UIButton(type: .system)
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        updateStats()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -35,6 +37,13 @@ class SettingsVC: UIViewController {
         setupConstraints()
     }
     
+    private func updateStats() {
+        let eventCount = DatabaseManager.shared.getEventCount()
+        let leagueCount = DatabaseManager.shared.getLeagueCount()
+        eventCountLabel.text = "Events in database: \(eventCount)"
+        leagueCountLabel.text = "Leagues in database: \(leagueCount)"
+    }
+    
     private func setupViews() {
         if let userName = AuthManager.shared.getUserName() {
             userInfoLabel.text = "Logged in as: \(userName)"
@@ -44,6 +53,14 @@ class SettingsVC: UIViewController {
         userInfoLabel.font = .systemFont(ofSize: 16)
         userInfoLabel.textColor = .darkText
         userInfoLabel.textAlignment = .center
+        
+        eventCountLabel.font = .systemFont(ofSize: 14)
+        eventCountLabel.textColor = .darkGray
+        eventCountLabel.textAlignment = .center
+        
+        leagueCountLabel.font = .systemFont(ofSize: 14)
+        leagueCountLabel.textColor = .darkGray
+        leagueCountLabel.textAlignment = .center
 
         logoutButton.setTitle("Logout", for: .normal)
         logoutButton.backgroundColor = .sofaLiveRed
@@ -52,6 +69,8 @@ class SettingsVC: UIViewController {
         logoutButton.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
         
         view.addSubview(userInfoLabel)
+        view.addSubview(eventCountLabel)
+        view.addSubview(leagueCountLabel)
         view.addSubview(logoutButton)
     }
     
@@ -71,8 +90,18 @@ class SettingsVC: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(24)
         }
         
+        eventCountLabel.snp.makeConstraints {
+            $0.top.equalTo(userInfoLabel.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(24)
+        }
+        
+        leagueCountLabel.snp.makeConstraints {
+            $0.top.equalTo(eventCountLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(24)
+        }
+        
         logoutButton.snp.makeConstraints {
-            $0.top.equalTo(userInfoLabel.snp.bottom).offset(32)
+            $0.top.equalTo(leagueCountLabel.snp.bottom).offset(32)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(120)
             $0.height.equalTo(44)
@@ -98,9 +127,11 @@ class SettingsVC: UIViewController {
     @objc private func logoutTapped() {
         AuthManager.shared.logout()
         
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-            appDelegate.checkAuthAndSetRoot()
-        }
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let loginVC = LoginVC()
+        let navController = UINavigationController(rootViewController: loginVC)
+        appDelegate.window?.rootViewController = navController
+        appDelegate.window?.makeKeyAndVisible()
     }
 }
 

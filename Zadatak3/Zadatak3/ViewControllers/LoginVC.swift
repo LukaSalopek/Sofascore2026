@@ -2,8 +2,6 @@
 //  LoginVC.swift
 //  Zadatak3
 //
-//  Created by akademija on 24.05.2026..
-//
 
 import UIKit
 import SnapKit
@@ -50,16 +48,22 @@ class LoginVC: UIViewController {
         Task {
             do {
                 let response = try await APIClient.shared.login(username: username, password: password)
-                AuthManager.shared.saveToken(response.token, userName: response.name)
+                let saved = AuthManager.shared.saveToken(response.token, userName: response.name)
+                
+                if !saved {
+                    await MainActor.run {
+                        loginView.hideLoading()
+                        loginView.showError("Failed to save login data")
+                    }
+                    return
+                }
                 
                 await MainActor.run {
-                    guard let window = UIApplication.shared.windows.first else { return }
-                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
                     let viewController = ViewController()
-                    let navigationController = UINavigationController(rootViewController: viewController)
-                    
-                    window.rootViewController = navigationController
-                    window.makeKeyAndVisible()
+                    let navController = UINavigationController(rootViewController: viewController)
+                    appDelegate.window?.rootViewController = navController
+                    appDelegate.window?.makeKeyAndVisible()
                 }
             } catch {
                 await MainActor.run {

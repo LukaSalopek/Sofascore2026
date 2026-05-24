@@ -25,7 +25,6 @@ class ViewController: UIViewController {
     private var currentLoadingTask: Task<Void, Never>?
     
     private var imageCache: [String: UIImage] = [:]
-    private let imageCacheQueue = DispatchQueue(label: "imageCacheQueue", attributes: .concurrent)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -186,42 +185,65 @@ class ViewController: UIViewController {
                 if self.currentSportSlug == currentSport {
                     self.sections = sections
                     self.tableView.reloadData()
-                    self.preloadImages(for: sections)
+                    
+                    for (sectionIndex, section) in sections.enumerated() {
+                        for (rowIndex, event) in section.events.enumerated() {
+                            if let homeUrl = event.homeTeam.logoUrl, imageCache[homeUrl] == nil {
+                                Task {
+                                    let image = await APIClient.shared.fetchImage(from: homeUrl)
+                                    if let image {
+                                        await MainActor.run {
+                                            self.imageCache[homeUrl] = image
+                                            let indexPath = IndexPath(row: rowIndex, section: sectionIndex)
+                                            if self.tableView.indexPathsForVisibleRows?.contains(indexPath) == true {
+                                                self.tableView.reloadRows(at: [indexPath], with: .none)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if let awayUrl = event.awayTeam.logoUrl, imageCache[awayUrl] == nil {
+                                Task {
+                                    let image = await APIClient.shared.fetchImage(from: awayUrl)
+                                    if let image {
+                                        await MainActor.run {
+                                            self.imageCache[awayUrl] = image
+                                            let indexPath = IndexPath(row: rowIndex, section: sectionIndex)
+                                            if self.tableView.indexPathsForVisibleRows?.contains(indexPath) == true {
+                                                self.tableView.reloadRows(at: [indexPath], with: .none)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             } catch {
                 if !Task.isCancelled {
-                    print(error)
+                    print("❌ loadData error: \(error)")
+                    self.handleLoadError(error)
                 }
             }
         }
     }
     
-    private func preloadImages(for sections: [Section]) {
-        for section in sections {
-            for event in section.events {
-                if let homeUrl = event.homeTeam.logoUrl, imageCache[homeUrl] == nil {
-                    Task {
-                        let image = await APIClient.shared.fetchImage(from: homeUrl)
-                        if let image {
-                            imageCacheQueue.async(flags: .barrier) {
-                                self.imageCache[homeUrl] = image
-                            }
-                        }
-                    }
-                }
-                
-                if let awayUrl = event.awayTeam.logoUrl, imageCache[awayUrl] == nil {
-                    Task {
-                        let image = await APIClient.shared.fetchImage(from: awayUrl)
-                        if let image {
-                            imageCacheQueue.async(flags: .barrier) {
-                                self.imageCache[awayUrl] = image
-                            }
-                        }
-                    }
-                }
-            }
+    private func handleLoadError(_ error: Error) {
+        if case APIError.unauthorized = error {
+            AuthManager.shared.logout()
+            let loginVC = LoginVC()
+            let nav = UINavigationController(rootViewController: loginVC)
+            view.window?.rootViewController = nav
+            return
         }
+        
+        let alert = UIAlertController(
+            title: "Greška pri učitavanju",
+            message: (error as? APIError)?.errorDescription ?? error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     private func getCachedImage(for urlString: String?) -> UIImage {
@@ -288,7 +310,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
 
-        let match = sections[indexPath.section].events[indexPath.row]
+        let match = sections[indexPath.section]
+            .events[indexPath.row]
         
         let homeLogo = getCachedImage(for: match.homeTeam.logoUrl)
         let awayLogo = getCachedImage(for: match.awayTeam.logoUrl)
