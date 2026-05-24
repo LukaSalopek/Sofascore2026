@@ -32,6 +32,26 @@ final class APIClient {
         
     }
     
+    func fetchEventsSecure(sport : String, token : String) async throws -> [Event] {
+        guard var urlComponents = URLComponents(string: "\(baseURL)/secure/events") else {
+            throw APIError.invalidURL
+        }
+        
+        urlComponents.queryItems = [URLQueryItem(name: "sport", value: sport)]
+        guard let url = urlComponents.url else { throw APIError.invalidURL }
+        
+        var request = URLRequest(url : url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw APIError.serverError
+        }
+        
+        return try JSONDecoder().decode([Event].self, from: data)
+    }
+    
     func fetchEventsOld(
         sport: String,
         completion: @escaping (Result<[Event], Error>) -> Void
@@ -95,6 +115,27 @@ final class APIClient {
         } catch {
             return nil
         }
+    }
+    
+    func login(username: String, password: String) async throws -> LoginResponse {
+        guard let url = URL(string: "\(baseURL)/login") else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body = LoginRequest(username: username, password: password)
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw APIError.serverError
+        }
+        
+        return try JSONDecoder().decode(LoginResponse.self, from: data)
     }
 
     
