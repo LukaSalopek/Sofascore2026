@@ -142,4 +142,35 @@ final class APIClient {
             throw APIError.decodingError(error)
         }
     }
+    
+    func fetchIncidents(eventId : Int) async throws -> [Incident] {
+        guard var url = URL(string: "\(baseURL)/events/\(eventId)/incidents") else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        if let token = AuthManager.shared.getToken() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        
+        if httpResponse.statusCode == 401 {
+            throw APIError.unauthorized
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw APIError.serverError(statusCode: httpResponse.statusCode, body: body)
+        }
+        do {
+            return try JSONDecoder().decode([Incident].self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+    }
 }

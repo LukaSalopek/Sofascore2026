@@ -9,9 +9,6 @@ import UIKit
 import SnapKit
 import SofaAcademic
 
-import UIKit
-import SnapKit
-
 class EventDetailsView : BaseView {
     
     private var homeTeamCard = TeamCard()
@@ -30,6 +27,8 @@ class EventDetailsView : BaseView {
     private var matchMinute = UILabel()
     private var awayTeamCard = TeamCard()
     
+    private let incidentsStack = UIStackView()
+    
     override func addViews(){
         addSubview(mainStack)
         mainStack.addArrangedSubview(homeTeamCard)
@@ -46,6 +45,8 @@ class EventDetailsView : BaseView {
         scoreStackView.addArrangedSubview(awayScoreLabel)
         
         infoStack.addArrangedSubview(matchMinute)
+        
+        addSubview(incidentsStack)
     }
     
     override func styleViews(){
@@ -77,11 +78,14 @@ class EventDetailsView : BaseView {
         
         matchMinute.font = .systemFont(ofSize: 12)
         matchMinute.textAlignment = .center
+        
+        incidentsStack.axis = .vertical
+        incidentsStack.spacing = 0
     }
     
     override func setupConstraints(){
         mainStack.snp.makeConstraints{
-            $0.leading.trailing.top.bottom.equalToSuperview().inset(16)
+            $0.leading.trailing.top.equalToSuperview().inset(16)
         }
         
         spacer.snp.makeConstraints{
@@ -105,6 +109,12 @@ class EventDetailsView : BaseView {
         
         matchMinute.snp.makeConstraints{
             $0.height.equalTo(16)
+        }
+        
+        incidentsStack.snp.makeConstraints{
+            $0.top.equalTo(mainStack.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -218,6 +228,12 @@ class EventDetailsView : BaseView {
         homeTeamCard.updateImage(image: homeLogo)
         awayTeamCard.updateImage(image: awayLogo)
     }
+    
+    func setIncidents(_ views: [UIView]) {
+        incidentsStack.arrangedSubviews.forEach {
+            incidentsStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        views.forEach { incidentsStack.addArrangedSubview($0) }
+    }
 }
-
-

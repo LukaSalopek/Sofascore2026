@@ -68,7 +68,9 @@ class EventDetailsVC: UIViewController {
                 )
             }
         }
+        loadIncidents()
     }
+    
     
     private func setupHeader() {
         header.backgroundColor = .white
@@ -104,6 +106,20 @@ class EventDetailsVC: UIViewController {
         contentView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(header.snp.bottom)
+        }
+    }
+    
+    private func loadIncidents(){
+        Task {
+            do {
+                let incidents = try await APIClient.shared.fetchIncidents(eventId: match.id)
+                await MainActor.run{
+                    let views = IncidentViewHelper.makeViews(from: incidents, sport: self.sport)
+                    self.contentView.setIncidents(views)
+                }
+            } catch {
+                print("incidents fetch failed : \(error)")
+            }
         }
     }
 }

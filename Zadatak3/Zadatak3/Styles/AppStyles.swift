@@ -14,7 +14,9 @@ extension UIColor {
     static let sofaLiveRed = UIColor.red
     static let sofaTextBlack = UIColor.black
     static let sofaBlue = UIColor(red: 55/255, green: 77/255, blue: 245/255, alpha: 1.0)
-}
+    static let sofaIncidentBackgrund = UIColor(red: 0xF7/255, green: 0xF6/255, blue: 0xEF/255, alpha: 1)
+    static let sofaEventDetailsBackground = UIColor(red: 0xEF/255, green: 0xF3/255, blue: 0xF8/255, alpha: 1)
+ }
 
 extension UIFont {
     static let sofaTime = UIFont.systemFont(ofSize: 12)
