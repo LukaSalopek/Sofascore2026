@@ -38,9 +38,9 @@ class PeriodIncidentView: BaseView {
 
         titleLabel.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.top.bottom.equalToSuperview().inset(12)
-            $0.leading.greaterThanOrEqualToSuperview().inset(92)
-            $0.trailing.lessThanOrEqualToSuperview().inset(92)
+            $0.top.bottom.equalTo(container).inset(4)
+            $0.leading.greaterThanOrEqualToSuperview().inset(100)
+            $0.trailing.lessThanOrEqualToSuperview().inset(100)
         }
     }
 

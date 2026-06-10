@@ -14,6 +14,7 @@ class GoalIncidentView: BaseView {
     enum Side { case home, away }
 
     private let incidentImage = UIImageView()
+    private let iconLabel = UILabel()
     private let incidentMinute = UILabel()
     private let separatarLine = UIView()
     private let scoreLabel = UILabel()
@@ -22,6 +23,7 @@ class GoalIncidentView: BaseView {
 
     override func addViews() {
         addSubview(incidentImage)
+        addSubview(iconLabel)
         addSubview(incidentMinute)
         addSubview(separatarLine)
         addSubview(scoreLabel)
@@ -30,6 +32,12 @@ class GoalIncidentView: BaseView {
     }
 
     override func styleViews() {
+        incidentImage.contentMode = .scaleAspectFit
+
+        iconLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        iconLabel.textColor = .sofaGreen
+        iconLabel.textAlignment = .center
+
         incidentMinute.textColor = .sofaGray
         incidentMinute.textAlignment = .center
         incidentMinute.font = .systemFont(ofSize: 12)
@@ -55,6 +63,10 @@ class GoalIncidentView: BaseView {
             $0.leading.equalToSuperview().inset(16)
         }
 
+        iconLabel.snp.makeConstraints {
+            $0.center.equalTo(incidentImage)
+        }
+
         incidentMinute.snp.makeConstraints {
             $0.top.equalTo(incidentImage.snp.bottom).offset(2)
             $0.centerX.equalTo(incidentImage)
@@ -76,13 +88,11 @@ class GoalIncidentView: BaseView {
             $0.centerY.equalToSuperview()
         }
 
-
         scoreGuide.snp.makeConstraints {
             $0.leading.equalTo(separatarLine.snp.trailing)
             $0.trailing.equalTo(playerName.snp.leading)
             $0.centerY.equalToSuperview()
         }
-
 
         scoreLabel.snp.makeConstraints {
             $0.centerX.equalTo(scoreGuide.snp.centerX)
@@ -92,16 +102,24 @@ class GoalIncidentView: BaseView {
         }
     }
 
-
     func setSide(_ side: Side) {
         semanticContentAttribute = (side == .home) ? .forceLeftToRight : .forceRightToLeft
         playerName.textAlignment = .natural
     }
 
-
-    func setImage(image: UIImage) {
-        incidentImage.image = image
+    func setIcon(_ icon: GoalIcon) {
+        switch icon {
+        case .image(let image):
+            incidentImage.image = image
+            incidentImage.isHidden = false
+            iconLabel.isHidden = true
+        case .points(let text):
+            iconLabel.text = text
+            iconLabel.isHidden = false
+            incidentImage.isHidden = true
+        }
     }
+
     func setPlayerName(playerName name: String) {
         playerName.text = name
     }
