@@ -128,10 +128,25 @@ enum IncidentMapper {
         case "basketball":
             return .points("\(points)")
         case "am-football":
-            return .image(UIImage(named: "ic_goal_am_football") ?? UIImage())
+            return .image(amFootballIcon(points: points))
         default:
             return .image(UIImage(named: "ic_goal_football") ?? UIImage())
         }
+    }
+
+    private static func amFootballIcon(points: Int) -> UIImage {
+        let name: String
+        switch points {
+        case 6:
+            name = "ic_goal_am_football"
+        case 3, 1:
+            name = "ic_field_goal_am_football"
+        case 2:
+            name = "ic_two_point_am_football"
+        default:
+            name = "ic_goal_am_football"
+        }
+        return UIImage(named: name) ?? UIImage()
     }
 
     private static func icon(for type: String) -> UIImage {

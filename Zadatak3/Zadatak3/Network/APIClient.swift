@@ -143,6 +143,64 @@ final class APIClient {
         }
     }
     
+    func fetchLeagueMatches(leagueId: Int) async throws -> [Event] {
+        guard let url = URL(string: "\(baseURL)/leagues/\(leagueId)/matches") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        if let token = AuthManager.shared.getToken() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        if httpResponse.statusCode == 401 {
+            throw APIError.unauthorized
+        }
+        guard httpResponse.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw APIError.serverError(statusCode: httpResponse.statusCode, body: body)
+        }
+        do {
+            return try JSONDecoder().decode([Event].self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+    }
+
+    func fetchLeagueStandings(leagueId: Int) async throws -> [Standings] {
+        guard let url = URL(string: "\(baseURL)/leagues/\(leagueId)/standings") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        if let token = AuthManager.shared.getToken() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        if httpResponse.statusCode == 401 {
+            throw APIError.unauthorized
+        }
+        guard httpResponse.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw APIError.serverError(statusCode: httpResponse.statusCode, body: body)
+        }
+        do {
+            return try JSONDecoder().decode([Standings].self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+    }
+
     func fetchIncidents(eventId : Int) async throws -> [Incident] {
         guard var url = URL(string: "\(baseURL)/events/\(eventId)/incidents") else {
             throw APIError.invalidURL

@@ -334,9 +334,15 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             return nil
         }
 
-        header.configure(
-            with: sections[section].league
-        )
+        let league = sections[section].league
+
+        header.configure(with: league)
+
+        header.onTap = { [weak self] in
+            guard let self else { return }
+            let leagueVC = LeagueDetailsVC(league: league, sportName: self.currentSportName)
+            self.navigationController?.pushViewController(leagueVC, animated: true)
+        }
 
         return header
     }

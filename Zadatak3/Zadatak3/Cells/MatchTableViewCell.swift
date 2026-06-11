@@ -50,7 +50,7 @@ class MatchTableViewCell: UITableViewCell {
 
     func configure(with match: Event, homeLogo: UIImage, awayLogo: UIImage) {
         resetMatchViewStyles()
-        
+
         matchView.setMatch(
             homeTeamName: match.homeTeam.name,
             awayTeamName: match.awayTeam.name,

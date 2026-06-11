@@ -10,26 +10,37 @@ class LeagueHeaderView: UITableViewHeaderFooterView {
     
     private let leagueView = LeagueView()
     private var currentImageLoadTask: Task<Void, Never>?
-    
+
     static let reuseIdentifier = "LeagueHeader"
+
+    var onTap: (() -> Void)?
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-        
+
         contentView.addSubview(leagueView)
-        
+
         leagueView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        contentView.addGestureRecognizer(tap)
+        contentView.isUserInteractionEnabled = true
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         currentImageLoadTask?.cancel()
+        onTap = nil
+    }
+
+    @objc private func handleTap() {
+        onTap?()
     }
     
     func configure(with league: League) {
