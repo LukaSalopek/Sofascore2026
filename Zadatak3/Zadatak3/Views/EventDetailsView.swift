@@ -27,6 +27,9 @@ class EventDetailsView : BaseView {
     private var matchMinute = UILabel()
     private var awayTeamCard = TeamCard()
 
+    var onHomeTeamTap: (() -> Void)?
+    var onAwayTeamTap: (() -> Void)?
+
     override func addViews(){
         addSubview(mainStack)
         mainStack.addArrangedSubview(homeTeamCard)
@@ -105,6 +108,26 @@ class EventDetailsView : BaseView {
         }
     }
 
+    override func setupGestureRecognizers() {
+        homeTeamCard.isUserInteractionEnabled = true
+        awayTeamCard.isUserInteractionEnabled = true
+
+        homeTeamCard.addGestureRecognizer(
+            UITapGestureRecognizer(target: self, action: #selector(homeTeamTapped))
+        )
+        awayTeamCard.addGestureRecognizer(
+            UITapGestureRecognizer(target: self, action: #selector(awayTeamTapped))
+        )
+    }
+
+    @objc private func homeTeamTapped() {
+        onHomeTeamTap?()
+    }
+
+    @objc private func awayTeamTapped() {
+        onAwayTeamTap?()
+    }
+
     func configure(with model: EventDetailsDisplayModel) {
             homeTeamCard.configure(teamName: model.homeTeamName, image: UIImage())
             awayTeamCard.configure(teamName: model.awayTeamName, image: UIImage())
@@ -136,25 +159,10 @@ class EventDetailsView : BaseView {
         }
 
         private func loadImage(from urlString: String, completion: @escaping (UIImage?) -> Void) {
-            guard let url = URL(string: urlString) else {
-                completion(nil)
-                return
+            Task {
+                let image = await APIClient.shared.fetchImage(from: urlString)
+                await MainActor.run { completion(image) }
             }
-
-            URLSession.shared.dataTask(with: url) { data, _, error in
-                guard error == nil,
-                      let data = data,
-                      let image = UIImage(data: data) else {
-                    DispatchQueue.main.async {
-                        completion(nil)
-                    }
-                    return
-                }
-
-                DispatchQueue.main.async {
-                    completion(image)
-                }
-            }.resume()
         }
 
 

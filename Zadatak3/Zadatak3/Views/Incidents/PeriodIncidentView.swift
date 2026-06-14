@@ -41,6 +41,7 @@ class PeriodIncidentView: BaseView {
             $0.top.bottom.equalTo(container).inset(4)
             $0.leading.greaterThanOrEqualToSuperview().inset(100)
             $0.trailing.lessThanOrEqualToSuperview().inset(100)
+            $0.height.equalTo(16)
         }
     }
 

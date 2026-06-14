@@ -61,6 +61,13 @@ class EventDetailsVC: UIViewController {
         matchView.configure(with: displayModel)
         emptyView.setShowsTournamentButton(match.status == .notStarted)
 
+        matchView.onHomeTeamTap = { [weak self] in
+            self?.openTeamDetails(self?.match.homeTeam)
+        }
+        matchView.onAwayTeamTap = { [weak self] in
+            self?.openTeamDetails(self?.match.awayTeam)
+        }
+
         Task {
             let homeLogo = await APIClient.shared.fetchImage(
                 from: displayModel.homeTeamLogoURL
@@ -133,6 +140,12 @@ class EventDetailsVC: UIViewController {
             $0.top.equalTo(matchView.snp.bottom).offset(8)
             $0.bottom.equalToSuperview()
         }
+    }
+
+    private func openTeamDetails(_ team: Team?) {
+        guard let team else { return }
+        let teamVC = TeamDetailsVC(team: team)
+        navigationController?.pushViewController(teamVC, animated: true)
     }
 
     private func loadIncidents(){

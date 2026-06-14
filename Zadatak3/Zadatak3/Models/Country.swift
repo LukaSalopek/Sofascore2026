@@ -6,5 +6,5 @@
 //
 
 public struct Country : Codable {
-    public let name : String
+    public let name : String?
 }

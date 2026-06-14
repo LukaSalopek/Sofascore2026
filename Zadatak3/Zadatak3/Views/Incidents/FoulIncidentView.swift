@@ -72,6 +72,7 @@ class FoulIncidentView : BaseView {
             $0.leading.equalTo(separatarLine.snp.trailing).offset(12)
             $0.height.equalTo(16)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.height.equalTo(16)
         }
         
         incidentType.snp.makeConstraints{

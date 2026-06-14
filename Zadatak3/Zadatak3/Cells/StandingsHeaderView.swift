@@ -34,7 +34,7 @@ class StandingsHeaderView: UITableViewHeaderFooterView {
         teamLabel.text = "Team"
 
         [positionLabel, teamLabel].forEach {
-            $0.font = .systemFont(ofSize: 12)
+            $0.font = .systemFont(ofSize: 14)
             $0.textColor = .sofaGray
         }
         positionLabel.textAlignment = .center
@@ -51,19 +51,22 @@ class StandingsHeaderView: UITableViewHeaderFooterView {
 
         positionLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
-            $0.width.equalTo(StandingsColumn.positionWidth)
+            $0.width.equalTo(8)
             $0.centerY.equalToSuperview()
-            $0.top.bottom.equalToSuperview().inset(12)
+            $0.top.bottom.equalToSuperview().inset(16)
+            $0.height.equalTo(16)
         }
 
         teamLabel.snp.makeConstraints {
-            $0.leading.equalTo(positionLabel.snp.trailing).offset(12)
+            $0.leading.equalTo(positionLabel.snp.trailing).offset(16)
             $0.centerY.equalToSuperview()
+            $0.height.equalTo(16)
         }
 
         statsStack.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview().inset(8)
             $0.centerY.equalToSuperview()
+            $0.height.equalTo(16)
         }
     }
 
@@ -73,7 +76,7 @@ class StandingsHeaderView: UITableViewHeaderFooterView {
         for column in columns {
             let label = UILabel()
             label.text = column.title
-            label.font = .systemFont(ofSize: 12)
+            label.font = .systemFont(ofSize: 14)
             label.textColor = .sofaGray
             label.textAlignment = .center
             label.snp.makeConstraints { $0.width.equalTo(column.width) }

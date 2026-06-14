@@ -13,5 +13,5 @@ public struct Player: Codable {
     public let jerseyNumber: String?
     public let country: Country?
     public let imageUrl: String?
-    public let isForeign: Bool
+    public let isForeign: Bool?
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import ImageIO
 
 final class APIClient {
 
@@ -108,10 +109,44 @@ final class APIClient {
 
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            return UIImage(data: data)
+            return APIClient.downsampledImage(from: data, maxPixelSize: 256)
+            ?? APIClient.safeImage(from: data)
         } catch {
             return nil
         }
+    }
+
+    private static func downsampledImage(from data: Data, maxPixelSize: Int) -> UIImage? {
+        let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+
+        guard let source = CGImageSourceCreateWithData(data as CFData, sourceOptions) else {
+            return nil
+        }
+
+        let thumbnailOptions: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxPixelSize
+        ]
+
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
+            return nil
+        }
+
+        return UIImage(cgImage: cgImage)
+    }
+
+    private static func safeImage(from data: Data, maxPixelSize: CGFloat = 1024) -> UIImage? {
+        guard let image = UIImage(data: data) else { return nil }
+
+        let pixelWidth = image.size.width * image.scale
+        let pixelHeight = image.size.height * image.scale
+
+        if pixelWidth > maxPixelSize || pixelHeight > maxPixelSize {
+            return nil
+        }
+        return image
     }
 
     func login(username: String, password: String) async throws -> LoginResponse {
@@ -196,6 +231,47 @@ final class APIClient {
         }
         do {
             return try JSONDecoder().decode([Standings].self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+    }
+
+    func fetchTeamInfo(teamId: Int) async throws -> TeamInfo {
+        try await get("/teams/\(teamId)")
+    }
+
+    func fetchTeamPlayers(teamId: Int) async throws -> [Player] {
+        try await get("/teams/\(teamId)/players")
+    }
+
+    func fetchTeamTournaments(teamId: Int) async throws -> [League] {
+        try await get("/teams/\(teamId)/tournaments")
+    }
+
+    private func get<T: Decodable>(_ path: String) async throws -> T {
+        guard let url = URL(string: "\(baseURL)\(path)") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        if let token = AuthManager.shared.getToken() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        if httpResponse.statusCode == 401 {
+            throw APIError.unauthorized
+        }
+        guard httpResponse.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw APIError.serverError(statusCode: httpResponse.statusCode, body: body)
+        }
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
         } catch {
             throw APIError.decodingError(error)
         }

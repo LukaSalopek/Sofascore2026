@@ -97,7 +97,7 @@ class LeagueDetailsVC: UIViewController {
         matchesTableView.separatorStyle = .none
         matchesTableView.sectionHeaderTopPadding = 0
         matchesTableView.sectionHeaderHeight = UITableView.automaticDimension
-        matchesTableView.estimatedSectionHeaderHeight = 44
+        matchesTableView.estimatedSectionHeaderHeight = 48
         matchesTableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.reuseIdentifier)
         matchesTableView.register(RoundHeaderView.self, forHeaderFooterViewReuseIdentifier: RoundHeaderView.reuseIdentifier)
 
@@ -107,7 +107,7 @@ class LeagueDetailsVC: UIViewController {
         standingsTableView.separatorStyle = .singleLine
         standingsTableView.sectionHeaderTopPadding = 0
         standingsTableView.sectionHeaderHeight = UITableView.automaticDimension
-        standingsTableView.estimatedSectionHeaderHeight = 44
+        standingsTableView.estimatedSectionHeaderHeight = 48
         standingsTableView.register(StandingsCell.self, forCellReuseIdentifier: StandingsCell.reuseIdentifier)
         standingsTableView.register(StandingsHeaderView.self, forHeaderFooterViewReuseIdentifier: StandingsHeaderView.reuseIdentifier)
     }
@@ -248,7 +248,11 @@ extension LeagueDetailsVC: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard tableView == matchesTableView else { return }
+        if tableView == standingsTableView {
+            let team = standings[indexPath.row].team
+            navigationController?.pushViewController(TeamDetailsVC(team: team), animated: true)
+            return
+        }
 
         let match = roundSections[indexPath.section].events[indexPath.row]
         let detailsVC = EventDetailsVC(match: match, sportName: sport)

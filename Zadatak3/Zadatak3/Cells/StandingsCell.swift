@@ -16,7 +16,7 @@ enum StandingsColumn {
     case points
     case percentage
 
-    static let positionWidth: CGFloat = 28
+    static let positionWidth: CGFloat = 24
 
     static func columns(for sport: String) -> [StandingsColumn] {
         let value = sport.lowercased()
@@ -45,11 +45,11 @@ enum StandingsColumn {
 
     var width: CGFloat {
         switch self {
-        case .goals: return 48
+        case .goals: return 40
         case .diff: return 44
         case .percentage: return 48
-        case .points: return 36
-        default: return 28
+        case .points: return 32
+        default: return 24
         }
     }
 
@@ -94,7 +94,7 @@ class StandingsCell: UITableViewCell {
     private let teamName = UILabel()
     private let statsStack = UIStackView()
 
-    private static let badgeSize: CGFloat = 28
+    private static let badgeSize: CGFloat = 24
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -116,7 +116,7 @@ class StandingsCell: UITableViewCell {
         positionBadge.layer.cornerRadius = StandingsCell.badgeSize / 2
         positionBadge.clipsToBounds = true
 
-        positionLabel.font = .systemFont(ofSize: 13)
+        positionLabel.font = .systemFont(ofSize: 14)
         positionLabel.textColor = .sofaTextBlack
         positionLabel.textAlignment = .center
 
@@ -137,10 +137,10 @@ class StandingsCell: UITableViewCell {
         contentView.addSubview(statsStack)
 
         positionBadge.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview().inset(8)
             $0.size.equalTo(StandingsCell.badgeSize)
             $0.centerY.equalToSuperview()
-            $0.top.bottom.equalToSuperview().inset(8)
+            $0.top.bottom.equalToSuperview().inset(12).priority(999)
         }
 
         positionLabel.snp.makeConstraints {
@@ -148,14 +148,16 @@ class StandingsCell: UITableViewCell {
         }
 
         teamName.snp.makeConstraints {
-            $0.leading.equalTo(positionBadge.snp.trailing).offset(12)
+            $0.leading.equalTo(positionBadge.snp.trailing).offset(8)
             $0.centerY.equalToSuperview()
             $0.trailing.lessThanOrEqualTo(statsStack.snp.leading).offset(-8)
+            $0.height.equalTo(16)
         }
 
         statsStack.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview().inset(8)
             $0.centerY.equalToSuperview()
+            $0.height.equalTo(16)
         }
     }
 

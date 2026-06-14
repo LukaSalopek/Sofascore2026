@@ -59,7 +59,7 @@ class GoalIncidentView: BaseView {
     override func setupConstraints() {
         incidentImage.snp.makeConstraints {
             $0.size.equalTo(24)
-            $0.top.equalToSuperview().inset(12)
+            $0.top.equalToSuperview().inset(8)
             $0.leading.equalToSuperview().inset(16)
         }
 
@@ -68,7 +68,7 @@ class GoalIncidentView: BaseView {
         }
 
         incidentMinute.snp.makeConstraints {
-            $0.top.equalTo(incidentImage.snp.bottom).offset(2)
+            $0.top.equalTo(incidentImage.snp.bottom)
             $0.centerX.equalTo(incidentImage)
             $0.width.equalTo(40)
             $0.height.equalTo(16)
@@ -86,6 +86,7 @@ class GoalIncidentView: BaseView {
             $0.leading.equalTo(separatarLine.snp.trailing).offset(100)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
             $0.centerY.equalToSuperview()
+            $0.height.equalTo(16)
         }
 
         scoreGuide.snp.makeConstraints {
@@ -99,6 +100,7 @@ class GoalIncidentView: BaseView {
             $0.centerY.equalToSuperview()
             $0.leading.greaterThanOrEqualTo(separatarLine.snp.trailing).offset(8)
             $0.trailing.lessThanOrEqualTo(playerName.snp.leading).offset(-8)
+            $0.height.equalTo(28)
         }
     }
 
