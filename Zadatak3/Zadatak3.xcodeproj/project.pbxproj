@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D2CF65A02FC3A25200A6D65D /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = D2CF659F2FC3A25200A6D65D /* GRDB */; };
 		D2F8A1962F6AE6A90071E45C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D2F8A1952F6AE6A90071E45C /* SnapKit */; };
 		D2F8A1992F6AE6BF0071E45C /* SofaAcademic in Frameworks */ = {isa = PBXBuildFile; productRef = D2F8A1982F6AE6BF0071E45C /* SofaAcademic */; };
 /* End PBXBuildFile section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2CF65A02FC3A25200A6D65D /* GRDB in Frameworks */,
 				D2F8A1992F6AE6BF0071E45C /* SofaAcademic in Frameworks */,
 				D2F8A1962F6AE6A90071E45C /* SnapKit in Frameworks */,
 			);
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				D2F8A1952F6AE6A90071E45C /* SnapKit */,
 				D2F8A1982F6AE6BF0071E45C /* SofaAcademic */,
+				D2CF659F2FC3A25200A6D65D /* GRDB */,
 			);
 			productName = Zadatak3;
 			productReference = D2F8A17C2F6AE51B0071E45C /* Zadatak3.app */;
@@ -119,6 +122,7 @@
 			packageReferences = (
 				D2F8A1942F6AE6A90071E45C /* XCRemoteSwiftPackageReference "SnapKit" */,
 				D2F8A1972F6AE6BF0071E45C /* XCRemoteSwiftPackageReference "academy" */,
+				D2CF659E2FC3A25200A6D65D /* XCRemoteSwiftPackageReference "GRDB" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D2F8A17D2F6AE51B0071E45C /* Products */;
@@ -354,6 +358,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		D2CF659E2FC3A25200A6D65D /* XCRemoteSwiftPackageReference "GRDB" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		D2F8A1942F6AE6A90071E45C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -373,6 +385,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D2CF659F2FC3A25200A6D65D /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D2CF659E2FC3A25200A6D65D /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
 		D2F8A1952F6AE6A90071E45C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D2F8A1942F6AE6A90071E45C /* XCRemoteSwiftPackageReference "SnapKit" */;

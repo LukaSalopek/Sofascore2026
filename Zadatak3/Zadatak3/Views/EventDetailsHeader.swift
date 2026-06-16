@@ -62,8 +62,12 @@ class EventDetailsHeader : BaseView {
         backButton.isUserInteractionEnabled = true
     }
     
-    func configure(leagueLogo: UIImage, sport: String, country: String, leagueName: String){
-        infoLabel.text = sport + ", " + country + ", " + leagueName
+    func configure(leagueLogo: UIImage, sport: String, country: String, leagueName: String, round: Int?){
+        var text = sport + ", " + country + ", " + leagueName
+        if let round {
+            text += ", Round \(round)"
+        }
+        infoLabel.text = text
         leagueImage.image = leagueLogo
     }
     

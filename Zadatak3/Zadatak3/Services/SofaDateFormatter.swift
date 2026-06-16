@@ -16,14 +16,15 @@ final class SofaDateFormatter {
         df.dateFormat = "HH:mm"
         return df
     }()
-    
+
     private init() {}
-    
+
     func formatter(interval: TimeInterval) -> String {
         let date = Date(timeIntervalSince1970: interval)
         return formatter.string(from: date)
     }
-    
+
+
     func dateFormat(interval: TimeInterval) -> Date {
         return Date(timeIntervalSince1970: interval)
     }
