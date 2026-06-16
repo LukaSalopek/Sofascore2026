@@ -10,7 +10,7 @@ class RoundHeaderView: UITableViewHeaderFooterView {
 
     static let reuseIdentifier = "RoundHeader"
 
-    private let titleLabel = UILabel()
+    private let roundView = RoundView()
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -19,15 +19,9 @@ class RoundHeaderView: UITableViewHeaderFooterView {
         background.backgroundColor = .sofaEventDetailsBackground
         backgroundView = background
 
-        titleLabel.font = .systemFont(ofSize: 12, weight: .bold)
-        titleLabel.textColor = .sofaTextBlack
-
-        contentView.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
-            $0.top.equalToSuperview().inset(24)
-            $0.bottom.equalToSuperview().inset(8)
-            $0.height.equalTo(16)
+        contentView.addSubview(roundView)
+        roundView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
 
@@ -36,6 +30,6 @@ class RoundHeaderView: UITableViewHeaderFooterView {
     }
 
     func configure(round: Int) {
-        titleLabel.text = "Round \(round)"
+        roundView.configure(round: round)
     }
 }

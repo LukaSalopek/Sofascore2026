@@ -16,12 +16,7 @@ class TeamDetailsVC: UIViewController {
 
     private var coach: TeamManager?
     private var players: [Player] = []
-
-    private let imageLoader: ImageLoader = { url, completion in
-        Task { @MainActor in
-            completion(await APIClient.shared.fetchImage(from: url))
-        }
-    }
+    private var imageCache: [String: UIImage] = [:]
 
     init(team: Team) {
         self.team = team
@@ -84,8 +79,6 @@ class TeamDetailsVC: UIViewController {
     }
 
     private func setupContent() {
-        detailsView.imageLoader = imageLoader
-
         squadTableView.dataSource = self
         squadTableView.delegate = self
         squadTableView.backgroundColor = .white
@@ -137,9 +130,35 @@ class TeamDetailsVC: UIViewController {
             if let country = info?.team.country?.name {
                 self.header.setCountry(country)
             }
-            self.detailsView.configure(info: info, players: players, tournaments: tournaments)
+
+            self.detailsView.configure(info: info, players: players, tournaments: tournaments, images: imageCache)
             self.squadTableView.reloadData()
+
+            let detailUrls = ([info?.manager?.imageUrl] + tournaments.map { $0.logoUrl }).compactMap { $0 }
+            let squadUrls = ([info?.manager?.imageUrl] + players.map { $0.imageUrl }).compactMap { $0 }
+
+            preloadImages(detailUrls + squadUrls) { [weak self] in
+                guard let self else { return }
+                self.detailsView.configure(info: info, players: players, tournaments: tournaments, images: self.imageCache)
+                self.squadTableView.reloadData()
+            }
         }
+    }
+
+    private func preloadImages(_ urls: [String], then reload: @escaping () -> Void) {
+        Task { @MainActor in
+            for url in Set(urls) where imageCache[url] == nil {
+                if let image = await APIClient.shared.fetchImage(from: url) {
+                    imageCache[url] = image
+                }
+            }
+            reload()
+        }
+    }
+
+    private func cachedImage(for urlString: String?) -> UIImage? {
+        guard let urlString else { return nil }
+        return imageCache[urlString]
     }
 
     private func fetchInfo() async -> TeamInfo? {
@@ -188,14 +207,15 @@ extension TeamDetailsVC: UITableViewDataSource, UITableViewDelegate {
 
         let label = UILabel()
         label.text = section == 0 ? "Coach" : "Players"
-        label.font = .systemFont(ofSize: 12, weight: .semibold)
-        label.textColor = .sofaGray
+        label.font = .systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .sofaTextBlack
 
         container.addSubview(label)
         label.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
-            $0.top.equalToSuperview().offset(12)
-            $0.bottom.equalToSuperview().offset(-4)
+            $0.top.equalToSuperview().offset(24)
+            $0.height.equalTo(16)
+            $0.bottom.equalToSuperview().inset(8)
         }
         return container
     }
@@ -217,10 +237,10 @@ extension TeamDetailsVC: UITableViewDataSource, UITableViewDelegate {
         }
 
         if indexPath.section == 0 {
-            cell.configure(name: coach?.name ?? "-", country: coach?.country?.name, imageUrl: coach?.imageUrl, imageLoader: imageLoader)
+            cell.configure(name: coach?.name ?? "-", country: coach?.country?.name, image: cachedImage(for: coach?.imageUrl))
         } else {
             let player = players[indexPath.row]
-            cell.configure(name: player.name, country: player.country?.name, imageUrl: player.imageUrl, imageLoader: imageLoader)
+            cell.configure(name: player.name, country: player.country?.name, image: cachedImage(for: player.imageUrl))
         }
         return cell
     }

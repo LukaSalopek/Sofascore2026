@@ -25,7 +25,6 @@ class TeamDetailsHeader: BaseView {
     private let teamLogo = UIImageView()
     private let nameLabel = UILabel()
     private let countryStack = UIStackView()
-    private let flagLabel = UILabel()
     private let countryLabel = UILabel()
 
     private let tabsStack = UIStackView()
@@ -41,7 +40,6 @@ class TeamDetailsHeader: BaseView {
         logoContainer.addSubview(teamLogo)
         addSubview(nameLabel)
         addSubview(countryStack)
-        countryStack.addArrangedSubview(flagLabel)
         countryStack.addArrangedSubview(countryLabel)
         addSubview(tabsStack)
 
@@ -79,7 +77,6 @@ class TeamDetailsHeader: BaseView {
         countryStack.alignment = .center
         countryStack.spacing = 6
 
-        flagLabel.font = .systemFont(ofSize: 14)
         countryLabel.font = .systemFont(ofSize: 14, weight: .semibold)
         countryLabel.textColor = .white
 
@@ -112,12 +109,18 @@ class TeamDetailsHeader: BaseView {
             $0.leading.equalTo(logoContainer.snp.trailing).offset(12)
             $0.top.equalTo(logoContainer.snp.top).offset(2)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.height.equalTo(16)
         }
 
         countryStack.snp.makeConstraints {
             $0.leading.equalTo(logoContainer.snp.trailing).offset(12)
             $0.top.equalTo(nameLabel.snp.bottom).offset(4)
             $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.height.equalTo(16)
+        }
+
+        countryLabel.snp.makeConstraints {
+            $0.height.equalTo(16)
         }
 
         tabsStack.snp.makeConstraints {
@@ -147,7 +150,6 @@ class TeamDetailsHeader: BaseView {
     }
 
     func setCountry(_ country: String) {
-        flagLabel.text = CountryFlag.emoji(for: country)
         countryLabel.text = country
     }
 

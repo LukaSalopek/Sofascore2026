@@ -5,64 +5,56 @@
 
 import UIKit
 import SnapKit
+import SofaAcademic
 
-typealias ImageLoader = (String?, @escaping (UIImage?) -> Void) -> Void
-
-class TeamDetailsView: UIView {
-
-    var imageLoader: ImageLoader?
-
-    static let avatarPlaceholder = UIImage(systemName: "person.crop.circle.fill")?
-        .withTintColor(.sofaLightGray, renderingMode: .alwaysOriginal)
+class TeamDetailsView: BaseView {
 
     private let scrollView = UIScrollView()
     private let contentStack = UIStackView()
 
-    init() {
-        super.init(frame: .zero)
-        backgroundColor = .white
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
-
-    private func setup() {
+    override func addViews() {
         addSubview(scrollView)
         scrollView.addSubview(contentStack)
+    }
+
+    override func styleViews() {
+        backgroundColor = .white
 
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.automaticallyAdjustsScrollIndicatorInsets = false
         scrollView.contentInsetAdjustmentBehavior = .never
+
+        contentStack.axis = .vertical
+    }
+
+    override func setupConstraints() {
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
         }
 
-        contentStack.axis = .vertical
         contentStack.snp.makeConstraints {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.frameLayoutGuide)
         }
     }
 
-    func configure(info: TeamInfo?, players: [Player], tournaments: [League]) {
+    func configure(info: TeamInfo?, players: [Player], tournaments: [League], images: [String: UIImage]) {
         contentStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
         let total = players.count
         let foreign = players.filter { $0.isForeign == true }.count
 
         contentStack.addArrangedSubview(makeTitle("Team Info"))
-        contentStack.addArrangedSubview(makeCoachRow(info?.manager))
+        contentStack.addArrangedSubview(makeCoachRow(info?.manager, images: images))
         contentStack.addArrangedSubview(makeSeparator())
         contentStack.addArrangedSubview(makeStatsRow(total: total, foreign: foreign))
 
         if !tournaments.isEmpty {
             contentStack.addArrangedSubview(makeSeparator())
             contentStack.addArrangedSubview(makeTitle("Tournaments"))
-            makeTournamentRows(tournaments).forEach { contentStack.addArrangedSubview($0) }
+            makeTournamentRows(tournaments, images: images).forEach { contentStack.addArrangedSubview($0) }
         }
 
         contentStack.addArrangedSubview(makeSeparator())
@@ -88,7 +80,7 @@ class TeamDetailsView: UIView {
         return container
     }
 
-    private func makeCoachRow(_ manager: TeamManager?) -> UIView {
+    private func makeCoachRow(_ manager: TeamManager?, images: [String: UIImage]) -> UIView {
         let container = UIView()
         container.snp.makeConstraints { $0.height.equalTo(56) }
 
@@ -97,30 +89,21 @@ class TeamDetailsView: UIView {
         image.clipsToBounds = true
         image.layer.cornerRadius = 20
         image.backgroundColor = .sofaIncidentBackgrund
-        loadImage(manager?.imageUrl, into: image, placeholder: TeamDetailsView.avatarPlaceholder)
+        image.image = self.image(for: manager?.imageUrl, in: images) ?? PlayerView.avatarPlaceholder
 
         let nameLabel = UILabel()
         nameLabel.font = .systemFont(ofSize: 14, weight: .semibold)
         nameLabel.textColor = .sofaTextBlack
         nameLabel.text = "Coach: \(manager?.name ?? "-")"
 
-        let flag = UILabel()
-        flag.font = .systemFont(ofSize: 14)
-        flag.text = CountryFlag.emoji(for: manager?.country?.name)
-
         let country = UILabel()
         country.font = .systemFont(ofSize: 12)
         country.textColor = .sofaGray
         country.text = manager?.country?.name ?? ""
 
-        let countryRow = UIStackView(arrangedSubviews: [flag, country])
-        countryRow.axis = .horizontal
-        countryRow.alignment = .center
-        countryRow.spacing = 4
-
         container.addSubview(image)
         container.addSubview(nameLabel)
-        container.addSubview(countryRow)
+        container.addSubview(country)
 
         image.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
@@ -134,11 +117,9 @@ class TeamDetailsView: UIView {
             $0.height.equalTo(16)
         }
         country.snp.makeConstraints {
-            $0.height.equalTo(16)
-        }
-        countryRow.snp.makeConstraints {
             $0.leading.equalTo(image.snp.trailing).offset(16)
             $0.bottom.equalToSuperview().inset(10)
+            $0.height.equalTo(16)
         }
         return container
     }
@@ -147,8 +128,7 @@ class TeamDetailsView: UIView {
         let container = UIView()
         container.snp.makeConstraints { $0.height.equalTo(116) }
 
-        let icon = UIImageView(image: UIImage(systemName: "person.2.fill"))
-        icon.tintColor = .sofaBlue
+        let icon = UIImageView(image: UIImage(named: "ic_team"))
         icon.contentMode = .scaleAspectFit
         icon.snp.makeConstraints { $0.size.equalTo(40) }
 
@@ -193,7 +173,7 @@ class TeamDetailsView: UIView {
         return column
     }
 
-    private func makeTournamentRows(_ tournaments: [League]) -> [UIView] {
+    private func makeTournamentRows(_ tournaments: [League], images: [String: UIImage]) -> [UIView] {
         var rows: [UIView] = []
         var index = 0
         while index < tournaments.count {
@@ -203,7 +183,7 @@ class TeamDetailsView: UIView {
 
             for offset in 0 ..< 3 {
                 if index + offset < tournaments.count {
-                    rowStack.addArrangedSubview(makeTournamentCell(tournaments[index + offset]))
+                    rowStack.addArrangedSubview(makeTournamentCell(tournaments[index + offset], images: images))
                 } else {
                     rowStack.addArrangedSubview(UIView())
                 }
@@ -223,12 +203,12 @@ class TeamDetailsView: UIView {
         return rows
     }
 
-    private func makeTournamentCell(_ tournament: League) -> UIView {
+    private func makeTournamentCell(_ tournament: League, images: [String: UIImage]) -> UIView {
         let cell = UIView()
 
         let logo = UIImageView()
         logo.contentMode = .scaleAspectFit
-        loadImage(tournament.logoUrl, into: logo)
+        logo.image = image(for: tournament.logoUrl, in: images)
 
         let nameLabel = UILabel()
         nameLabel.font = .systemFont(ofSize: 12)
@@ -263,7 +243,7 @@ class TeamDetailsView: UIView {
         titleLabel.text = "Stadium"
 
         let valueLabel = UILabel()
-        valueLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        valueLabel.font = .systemFont(ofSize: 14)
         valueLabel.textColor = .sofaTextBlack
         valueLabel.textAlignment = .right
         valueLabel.text = venue?.name ?? "-"
@@ -291,7 +271,7 @@ class TeamDetailsView: UIView {
         container.snp.makeConstraints { $0.height.equalTo(8) }
 
         let line = UIView()
-        line.backgroundColor = .sofaSeparator
+        line.backgroundColor = .sofaSeparatorLight
         container.addSubview(line)
         line.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
@@ -300,10 +280,8 @@ class TeamDetailsView: UIView {
         return container
     }
 
-    private func loadImage(_ urlString: String?, into imageView: UIImageView, placeholder: UIImage? = nil) {
-        imageView.image = placeholder
-        imageLoader?(urlString) { image in
-            imageView.image = image ?? placeholder
-        }
+    private func image(for urlString: String?, in images: [String: UIImage]) -> UIImage? {
+        guard let urlString else { return nil }
+        return images[urlString]
     }
 }

@@ -9,7 +9,7 @@ class ProgressRingView: UIView {
 
     private let trackLayer = CAShapeLayer()
     private let progressLayer = CAShapeLayer()
-    private let lineWidth: CGFloat = 4
+    private let lineWidth: CGFloat = 8
     private var progress: CGFloat = 0
 
     override init(frame: CGRect) {
@@ -17,7 +17,7 @@ class ProgressRingView: UIView {
         backgroundColor = .clear
 
         trackLayer.fillColor = UIColor.clear.cgColor
-        trackLayer.strokeColor = UIColor.sofaSeparator.cgColor
+        trackLayer.strokeColor = UIColor.sofaIncidentBackgrund.cgColor
         trackLayer.lineWidth = lineWidth
 
         progressLayer.fillColor = UIColor.clear.cgColor

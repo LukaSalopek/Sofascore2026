@@ -16,7 +16,6 @@ class LeagueDetailsHeader: BaseView {
     private let leagueLogo = UIImageView()
     private let nameLabel = UILabel()
     private let countryStack = UIStackView()
-    private let flagLabel = UILabel()
     private let countryLabel = UILabel()
 
     private let tabsStack = UIStackView()
@@ -33,7 +32,6 @@ class LeagueDetailsHeader: BaseView {
         logoContainer.addSubview(leagueLogo)
         addSubview(nameLabel)
         addSubview(countryStack)
-        countryStack.addArrangedSubview(flagLabel)
         countryStack.addArrangedSubview(countryLabel)
         addSubview(tabsStack)
         tabsStack.addArrangedSubview(matchesButton)
@@ -60,8 +58,6 @@ class LeagueDetailsHeader: BaseView {
         countryStack.axis = .horizontal
         countryStack.alignment = .center
         countryStack.spacing = 6
-
-        flagLabel.font = .systemFont(ofSize: 14)
 
         countryLabel.font = .systemFont(ofSize: 14, weight: .bold)
         countryLabel.textColor = .white
@@ -137,7 +133,6 @@ class LeagueDetailsHeader: BaseView {
     func configure(logo: UIImage, name: String, country: String) {
         leagueLogo.image = logo
         nameLabel.text = name
-        flagLabel.text = CountryFlag.emoji(for: country)
         countryLabel.text = country
     }
 

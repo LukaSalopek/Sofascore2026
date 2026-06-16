@@ -157,17 +157,8 @@ enum IncidentMapper {
             return UIImage(named: "ic_yellow_card")?
                 .withTintColor(.sofaRedCard, renderingMode: .alwaysOriginal) ?? UIImage()
         default:
-            return cardImage(color: .sofaGray)
-        }
-    }
-
-    private static func cardImage(color: UIColor) -> UIImage {
-        let size = CGSize(width: 24, height: 24)
-        return UIGraphicsImageRenderer(size: size).image { _ in
-            let rect = CGRect(x: 7, y: 4, width: 10, height: 16)
-            let path = UIBezierPath(roundedRect: rect, cornerRadius: 2)
-            color.setFill()
-            path.fill()
+            return UIImage(named: "ic_yellow_card")?
+                .withTintColor(.sofaGray, renderingMode: .alwaysOriginal) ?? UIImage()
         }
     }
 

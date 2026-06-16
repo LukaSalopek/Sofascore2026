@@ -132,14 +132,6 @@ class EventDetailsView : BaseView {
             homeTeamCard.configure(teamName: model.homeTeamName, image: UIImage())
             awayTeamCard.configure(teamName: model.awayTeamName, image: UIImage())
 
-        loadImage(from: model.homeTeamLogoURL ?? "") { [weak self] image in
-                self?.homeTeamCard.updateImage(image: image ?? UIImage())
-            }
-
-        loadImage(from: model.awayTeamLogoURL ?? "") { [weak self] image in
-                self?.awayTeamCard.updateImage(image: image ?? UIImage())
-            }
-
             homeTeamCard.updateNameColor(color: .sofaTextBlack)
             awayTeamCard.updateNameColor(color: .sofaTextBlack)
 
@@ -157,15 +149,6 @@ class EventDetailsView : BaseView {
                 setupFinishedUI(homeScore: homeTeamScore, awayScore: awayTeamScore, homeColor: homeTeamColor, awayColor: awayTeamColor)
             }
         }
-
-        private func loadImage(from urlString: String, completion: @escaping (UIImage?) -> Void) {
-            Task {
-                let image = await APIClient.shared.fetchImage(from: urlString)
-                await MainActor.run { completion(image) }
-            }
-        }
-
-
 
     private func setupLiveUI(homeScore: String, awayScore: String, minute: String) {
         toggleScoreUI(showScore: true)

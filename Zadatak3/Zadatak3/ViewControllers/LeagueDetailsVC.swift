@@ -16,8 +16,6 @@ class LeagueDetailsVC: UIViewController {
     private let matchesTableView = UITableView(frame: .zero, style: .plain)
     private let standingsTableView = UITableView(frame: .zero, style: .plain)
 
-    private let service = LeagueService()
-
     private var roundSections: [RoundSection] = []
     private var standings: [Standings] = []
     private var imageCache: [String: UIImage] = [:]
@@ -137,7 +135,8 @@ class LeagueDetailsVC: UIViewController {
     private func loadMatches() {
         Task { @MainActor in
             do {
-                roundSections = try await service.getMatchesGroupedByRound(leagueId: league.id)
+                let matches = try await APIClient.shared.fetchLeagueMatches(leagueId: league.id)
+                roundSections = LeagueDetailsMapper.groupByRound(matches: matches)
                 matchesTableView.reloadData()
 
                 let urls = roundSections
@@ -157,7 +156,8 @@ class LeagueDetailsVC: UIViewController {
     private func loadStandings() {
         Task { @MainActor in
             do {
-                standings = try await service.getStandings(leagueId: league.id)
+                let rows = try await APIClient.shared.fetchLeagueStandings(leagueId: league.id)
+                standings = LeagueDetailsMapper.sortStandings(rows)
                 standingsTableView.reloadData()
             } catch {
                 print("❌ loadStandings error: \(error)")
@@ -167,12 +167,9 @@ class LeagueDetailsVC: UIViewController {
 
     private func preloadLogos(_ urls: [String], then reload: @escaping () -> Void) {
         Task { @MainActor in
-            await withTaskGroup(of: (String, UIImage?).self) { group in
-                for url in Set(urls) where imageCache[url] == nil {
-                    group.addTask { (url, await APIClient.shared.fetchImage(from: url)) }
-                }
-                for await (url, image) in group {
-                    if let image { imageCache[url] = image }
+            for url in Set(urls) where imageCache[url] == nil {
+                if let image = await APIClient.shared.fetchImage(from: url) {
+                    imageCache[url] = image
                 }
             }
             reload()

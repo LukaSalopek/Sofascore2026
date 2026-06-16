@@ -14,6 +14,7 @@ class EventDetailsVC: UIViewController {
 
     private let header = EventDetailsHeader()
     private let matchView = EventDetailsView()
+    private let incidentsSpacer = UIView()
     private let tableView = UITableView()
     private let emptyView = IncidentsEmptyView()
 
@@ -45,12 +46,14 @@ class EventDetailsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .sofaEventDetailsBackground
+        view.backgroundColor = .white
 
         header.backgroundColor = .white
         matchView.backgroundColor = .white
+        incidentsSpacer.backgroundColor = .sofaEventDetailsBackground
 
         view.addSubview(matchView)
+        view.addSubview(incidentsSpacer)
         view.addSubview(tableView)
 
         setupTableView()
@@ -66,6 +69,10 @@ class EventDetailsVC: UIViewController {
         }
         matchView.onAwayTeamTap = { [weak self] in
             self?.openTeamDetails(self?.match.awayTeam)
+        }
+
+        emptyView.onTournamentTap = { [weak self] in
+            self?.openTournamentDetails()
         }
 
         Task {
@@ -135,9 +142,15 @@ class EventDetailsVC: UIViewController {
             $0.top.equalTo(header.snp.bottom)
         }
 
+        incidentsSpacer.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(matchView.snp.bottom)
+            $0.height.equalTo(8)
+        }
+
         tableView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(matchView.snp.bottom).offset(8)
+            $0.top.equalTo(incidentsSpacer.snp.bottom)
             $0.bottom.equalToSuperview()
         }
     }
@@ -146,6 +159,12 @@ class EventDetailsVC: UIViewController {
         guard let team else { return }
         let teamVC = TeamDetailsVC(team: team)
         navigationController?.pushViewController(teamVC, animated: true)
+    }
+
+    private func openTournamentDetails() {
+        guard let league = match.league else { return }
+        let leagueVC = LeagueDetailsVC(league: league, sportName: sport)
+        navigationController?.pushViewController(leagueVC, animated: true)
     }
 
     private func loadIncidents(){

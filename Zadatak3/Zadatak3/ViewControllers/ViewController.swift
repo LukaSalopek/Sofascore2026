@@ -187,6 +187,25 @@ class ViewController: UIViewController {
                     self.tableView.reloadData()
                     
                     for (sectionIndex, section) in sections.enumerated() {
+                        if let logoUrl = section.league.logoUrl, imageCache[logoUrl] == nil {
+                            Task {
+                                let image = await APIClient.shared.fetchImage(from: logoUrl)
+                                if let image {
+                                    await MainActor.run {
+                                        self.imageCache[logoUrl] = image
+                                        guard sectionIndex < self.sections.count,
+                                              self.sections[sectionIndex].league.logoUrl == logoUrl,
+                                              let headerView = self.tableView.headerView(forSection: sectionIndex) as? LeagueHeaderView else {
+                                            return
+                                        }
+                                        headerView.configure(
+                                            with: self.sections[sectionIndex].league,
+                                            logo: image
+                                        )
+                                    }
+                                }
+                            }
+                        }
                         for (rowIndex, event) in section.events.enumerated() {
                             if let homeUrl = event.homeTeam.logoUrl, imageCache[homeUrl] == nil {
                                 Task {
@@ -336,7 +355,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 
         let league = sections[section].league
 
-        header.configure(with: league)
+        header.configure(with: league, logo: getCachedImage(for: league.logoUrl))
 
         header.onTap = { [weak self] in
             guard let self else { return }
